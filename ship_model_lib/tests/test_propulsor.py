@@ -17,20 +17,22 @@ def propulsor_b_series() -> PropulsorDataBseries:
         z_blade_number=5,
     )
 
+
 @pytest.fixture
 def propulsor_scalar() -> PropulsorDataScalar:
-    return PropulsorDataScalar(
-        efficiency=0.7
-    )
+    return PropulsorDataScalar(efficiency=0.7)
+
 
 def test_negative_thrust(propulsor_b_series: PropulsorDataBseries):
     speed_list = np.array([0, 14, 0])
     thrust_list = np.array([random.random(), -random.random(), -random.random()]) * 1000
     # Test with scalar value
     for vessel_speed_kn, thrust_resistance_newton in zip(speed_list, thrust_list):
-        performance_data = propulsor_b_series.get_propulsor_data_from_vessel_speed_thrust(
-            vessel_speed_kn=vessel_speed_kn,
-            thrust_resistance_newton=thrust_resistance_newton,
+        performance_data = (
+            propulsor_b_series.get_propulsor_data_from_vessel_speed_thrust(
+                vessel_speed_kn=vessel_speed_kn,
+                thrust_resistance_newton=thrust_resistance_newton,
+            )
         )
         assert np.allclose(performance_data.n_rpm, 0)
         assert np.allclose(performance_data.shaft_power_kw, 0)
@@ -57,14 +59,12 @@ def test_propulsor_data_scalar():
         added_resistance_wind_newton=0,
         added_resistance_wave_newton=0,
     )
-    propulsor = PropulsorDataScalar(
-        efficiency=efficiency
-    )
+    propulsor = PropulsorDataScalar(efficiency=efficiency)
     propeller_operating_point = propulsor.get_propulsor_data_from_vessel_speed_thrust(
         vessel_speed_kn=vessel_speed_kn,
         thrust_resistance_newton=thrust,
     )
     assert np.allclose(
         propeller_operating_point.shaft_power_kw,
-        hull_operating_point.total_towing_power_kw / efficiency
+        hull_operating_point.total_towing_power_kw / efficiency,
     )

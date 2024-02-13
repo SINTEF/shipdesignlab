@@ -15,20 +15,20 @@ class SimpleShipStub(object):
             channel: A grpc.Channel.
         """
         self.get_ship_performance_data_from_speed = channel.unary_unary(
-                '/simpleShipService.SimpleShip/get_ship_performance_data_from_speed',
-                request_serializer=sps__interface__pb2.SpeedDataForCalculation.SerializeToString,
-                response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
-                )
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_speed",
+            request_serializer=sps__interface__pb2.SpeedDataForCalculation.SerializeToString,
+            response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
+        )
         self.get_ship_performance_data_from_power = channel.unary_unary(
-                '/simpleShipService.SimpleShip/get_ship_performance_data_from_power',
-                request_serializer=sps__interface__pb2.PowerDataForCalculation.SerializeToString,
-                response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
-                )
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_power",
+            request_serializer=sps__interface__pb2.PowerDataForCalculation.SerializeToString,
+            response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
+        )
         self.get_ship_performance_data_from_operation_point = channel.unary_unary(
-                '/simpleShipService.SimpleShip/get_ship_performance_data_from_operation_point',
-                request_serializer=sps__interface__pb2.OperationDataForCalculation.SerializeToString,
-                response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
-                )
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_operation_point",
+            request_serializer=sps__interface__pb2.OperationDataForCalculation.SerializeToString,
+            response_deserializer=sps__interface__pb2.ShipCalculationResults.FromString,
+        )
 
 
 class SimpleShipServicer(object):
@@ -37,96 +37,133 @@ class SimpleShipServicer(object):
     def get_ship_performance_data_from_speed(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def get_ship_performance_data_from_power(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def get_ship_performance_data_from_operation_point(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_SimpleShipServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'get_ship_performance_data_from_speed': grpc.unary_unary_rpc_method_handler(
-                    servicer.get_ship_performance_data_from_speed,
-                    request_deserializer=sps__interface__pb2.SpeedDataForCalculation.FromString,
-                    response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
-            ),
-            'get_ship_performance_data_from_power': grpc.unary_unary_rpc_method_handler(
-                    servicer.get_ship_performance_data_from_power,
-                    request_deserializer=sps__interface__pb2.PowerDataForCalculation.FromString,
-                    response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
-            ),
-            'get_ship_performance_data_from_operation_point': grpc.unary_unary_rpc_method_handler(
-                    servicer.get_ship_performance_data_from_operation_point,
-                    request_deserializer=sps__interface__pb2.OperationDataForCalculation.FromString,
-                    response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
-            ),
+        "get_ship_performance_data_from_speed": grpc.unary_unary_rpc_method_handler(
+            servicer.get_ship_performance_data_from_speed,
+            request_deserializer=sps__interface__pb2.SpeedDataForCalculation.FromString,
+            response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
+        ),
+        "get_ship_performance_data_from_power": grpc.unary_unary_rpc_method_handler(
+            servicer.get_ship_performance_data_from_power,
+            request_deserializer=sps__interface__pb2.PowerDataForCalculation.FromString,
+            response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
+        ),
+        "get_ship_performance_data_from_operation_point": grpc.unary_unary_rpc_method_handler(
+            servicer.get_ship_performance_data_from_operation_point,
+            request_deserializer=sps__interface__pb2.OperationDataForCalculation.FromString,
+            response_serializer=sps__interface__pb2.ShipCalculationResults.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'simpleShipService.SimpleShip', rpc_method_handlers)
+        "simpleShipService.SimpleShip", rpc_method_handlers
+    )
     server.add_generic_rpc_handlers((generic_handler,))
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class SimpleShip(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def get_ship_performance_data_from_speed(request,
+    def get_ship_performance_data_from_speed(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simpleShipService.SimpleShip/get_ship_performance_data_from_speed',
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_speed",
             sps__interface__pb2.SpeedDataForCalculation.SerializeToString,
             sps__interface__pb2.ShipCalculationResults.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def get_ship_performance_data_from_power(request,
+    def get_ship_performance_data_from_power(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simpleShipService.SimpleShip/get_ship_performance_data_from_power',
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_power",
             sps__interface__pb2.PowerDataForCalculation.SerializeToString,
             sps__interface__pb2.ShipCalculationResults.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def get_ship_performance_data_from_operation_point(request,
+    def get_ship_performance_data_from_operation_point(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simpleShipService.SimpleShip/get_ship_performance_data_from_operation_point',
+            "/simpleShipService.SimpleShip/get_ship_performance_data_from_operation_point",
             sps__interface__pb2.OperationDataForCalculation.SerializeToString,
             sps__interface__pb2.ShipCalculationResults.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )

@@ -38,6 +38,7 @@ class ResistanceLevel(Enum):
 
 class PropulsionType(Enum):
     """Enum for machinery type"""
+
     MECHANICAL = "mechanical"
     ELECTRIC = "electric"
     HYBRID = "hybrid"

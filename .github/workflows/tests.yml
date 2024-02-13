@@ -43,3 +43,8 @@ jobs:
         run: |
           cd ${{ matrix.project }}
           nbdev_test --do_print
+      
+      - name: Check formatting by black
+        run: |
+          cd ${{ matrix.project }}
+          black --check .

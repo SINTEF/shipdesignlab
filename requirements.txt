@@ -16,6 +16,7 @@ tqdm
 twine~=4.0.2
 typing_extensions~=4.4.0
 types-protobuf~=4.21.0.3
+black[jupyter]~=24.2.0
 -e ./operation_profile_lib
 -e ./ship_performance_service_interface
 -e ./ship_model_lib

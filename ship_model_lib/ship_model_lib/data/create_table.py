@@ -25,7 +25,9 @@ value = df_temp["value"].values
 # value = interpolate.PchipInterpolator(index, value)(df.index)
 interval = 180 / (value.size - 1)
 if interval != 10 and interval > 0:
-    value = interpolate.PchipInterpolator(np.arange(0, 180 + interval, interval), value)(df.index)
+    value = interpolate.PchipInterpolator(
+        np.arange(0, 180 + interval, interval), value
+    )(df.index)
 if interval > 0:
     df[new_column_name] = value
     df.to_csv("drag_coefficient.csv", index=True)

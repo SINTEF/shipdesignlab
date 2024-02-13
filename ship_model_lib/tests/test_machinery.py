@@ -9,7 +9,9 @@ from ship_model_lib.machinery import (
     FuelByMassFraction,
     PowerLoad,
     LoadInput,
-    PropulsionType, Curve, Point
+    PropulsionType,
+    Curve,
+    Point,
 )
 
 
@@ -22,29 +24,40 @@ def get_machinery_system_nodel(
     rated_power_auxiliary_kw: float = None,
 ) -> MachinerySystem:
     """Get a machinery system model for the test."""
-    mechanical_system = MachinerySubsystemSimple(
-        power_source=PowerSourceWithEfficiency(
-            fuel=FuelByMassFraction(hydrogen=1.0),
-            efficiency=efficiency_power_source,
-            rated_power_kw=rated_power_source_kw,
-        ),
-        propulsion_load=PowerLoad(efficiency=efficiency_propulsion_drive)
-    ) if propulsion_type == PropulsionType.MECHANICAL else None
+    mechanical_system = (
+        MachinerySubsystemSimple(
+            power_source=PowerSourceWithEfficiency(
+                fuel=FuelByMassFraction(hydrogen=1.0),
+                efficiency=efficiency_power_source,
+                rated_power_kw=rated_power_source_kw,
+            ),
+            propulsion_load=PowerLoad(efficiency=efficiency_propulsion_drive),
+        )
+        if propulsion_type == PropulsionType.MECHANICAL
+        else None
+    )
     electric_system = MachinerySubsystemSimple(
         power_source=PowerSourceWithEfficiency(
             fuel=FuelByMassFraction(hydrogen=1.0),
             efficiency=efficiency_power_source,
-            rated_power_kw=rated_power_source_kw if propulsion_type == PropulsionType.ELECTRIC
-                            else rated_power_auxiliary_kw
+            rated_power_kw=(
+                rated_power_source_kw
+                if propulsion_type == PropulsionType.ELECTRIC
+                else rated_power_auxiliary_kw
+            ),
         ),
-        propulsion_load=PowerLoad(efficiency=efficiency_propulsion_drive) if propulsion_type == PropulsionType.ELECTRIC else None,
-        auxiliary_load=PowerLoad(efficiency=efficiency_auxiliary_load)
+        propulsion_load=(
+            PowerLoad(efficiency=efficiency_propulsion_drive)
+            if propulsion_type == PropulsionType.ELECTRIC
+            else None
+        ),
+        auxiliary_load=PowerLoad(efficiency=efficiency_auxiliary_load),
     )
 
     return MachinerySystem(
         propulsion_type=propulsion_type,
         mechanical_system=mechanical_system,
-        electric_system=electric_system
+        electric_system=electric_system,
     )
 
 
@@ -87,7 +100,7 @@ def test_get_machinery_result_with_mechanical_propulsion():
         efficiency_power_source=0.45,
         efficiency_auxiliary_load=1.0,
         rated_power_source_kw=20000.0,
-        rated_power_auxiliary_kw=auxiliary_load * 1.5
+        rated_power_auxiliary_kw=auxiliary_load * 1.5,
     )
 
     # Test the wrong input
@@ -120,7 +133,7 @@ def test_get_machinery_result_with_mechanical_propulsion():
             mechanical_load=LoadInput(
                 propulsion_load_kw=propulsion_load_kw,
                 auxiliary_load_kw=auxiliary_load,
-            )
+            ),
         )
     with pytest.raises(AssertionError):
         machinery_system.get_machinery_result(
@@ -128,7 +141,7 @@ def test_get_machinery_result_with_mechanical_propulsion():
                 propulsion_load_kw=0,
                 auxiliary_load_kw=auxiliary_load,
             ),
-            mechanical_load=None
+            mechanical_load=None,
         )
     with pytest.raises(AssertionError):
         machinery_system.get_machinery_result(
@@ -136,7 +149,7 @@ def test_get_machinery_result_with_mechanical_propulsion():
             mechanical_load=LoadInput(
                 propulsion_load_kw=propulsion_load_kw,
                 auxiliary_load_kw=auxiliary_load,
-            )
+            ),
         )
 
     # Test the correct input
@@ -148,12 +161,12 @@ def test_get_machinery_result_with_mechanical_propulsion():
         electric_load=LoadInput(
             propulsion_load_kw=0,
             auxiliary_load_kw=auxiliary_load,
-        )
+        ),
     )
-    assert result.mechanical_system.power_on_source_kw == \
-        pytest.approx(propulsion_load_kw / efficiency_propulsion_drive)
-    assert result.electric_system.power_on_source_kw == \
-        pytest.approx(auxiliary_load)
+    assert result.mechanical_system.power_on_source_kw == pytest.approx(
+        propulsion_load_kw / efficiency_propulsion_drive
+    )
+    assert result.electric_system.power_on_source_kw == pytest.approx(auxiliary_load)
 
 
 def test_get_machinery_result_with_electric_propulsion():
@@ -177,12 +190,12 @@ def test_get_machinery_result_with_electric_propulsion():
         electric_load=electric_power_consumption
     )
     power_at_source = propulsion_load_kw / efficiency_propulsion_drive + auxiliary_load
-    fuel_consumption_calculated = \
+    fuel_consumption_calculated = (
         machinery_system.electric_system.power_source.get_fuel_consumption_kg_per_h(
             power_at_source
         ).total_fuel_consumption
-    assert np.allclose(
-        fuel_consumption_calculated, result.total.fuel_consumption.total_fuel_consumption
     )
-
-
+    assert np.allclose(
+        fuel_consumption_calculated,
+        result.total.fuel_consumption.total_fuel_consumption,
+    )

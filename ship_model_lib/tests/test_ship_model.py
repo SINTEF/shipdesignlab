@@ -8,57 +8,74 @@ from ship_model_lib.added_resistance import (
     AddedResistanceWindITTC,
     AddedResistanceBySNNM,
     AddedResistanceBySeaMarginCurve,
-    WaveSpectrumType
+    WaveSpectrumType,
 )
-from ship_model_lib.machinery import PowerLoad, Curve, Point, PropulsionType, MachinerySystem
+from ship_model_lib.machinery import (
+    PowerLoad,
+    Curve,
+    Point,
+    PropulsionType,
+    MachinerySystem,
+)
 from ship_model_lib.ship_dimensions import (
     ShipDimensionsHollenbachTwinScrew,
-    ShipDimensionsAddedResistance
+    ShipDimensionsAddedResistance,
 )
 from ship_model_lib.ship_model import ShipModel, ShipDescription, ShipType
 from ship_model_lib.propulsor import PropulsorDataScalar, PropulsorDataBseries
 from ship_model_lib.calm_water_resistance import (
     CalmWaterResistanceBySpeedPowerCurve,
-    CalmWaterResistanceHollenbachTwinScrewDesignDraft
+    CalmWaterResistanceHollenbachTwinScrewDesignDraft,
 )
 from test_machinery import get_machinery_system_nodel
 from test_added_resistance import ship_dimension
 
 
-def verify_ship_model_performance(ship_model: ShipModel, speed_array_kn: np.ndarray = None):
+def verify_ship_model_performance(
+    ship_model: ShipModel, speed_array_kn: np.ndarray = None
+):
     """Verify the method to get performance of the ship model."""
     auxiliary_power_kw = 500
     performance_data = ship_model.get_ship_performance_data_from_speed(
-        vessel_speed_kn=speed_array_kn,
-        auxiliary_power_kw=auxiliary_power_kw
+        vessel_speed_kn=speed_array_kn, auxiliary_power_kw=auxiliary_power_kw
     )
     performance_data_backward = ship_model.get_ship_performance_data_from_power(
         power_out_source_kw=performance_data.power_source_data.total.power_on_source_kw,
-        auxiliary_power_kw=auxiliary_power_kw
+        auxiliary_power_kw=auxiliary_power_kw,
     )
 
     assert np.all(performance_data.propeller_data.shaft_power_kw[1:] > 0)
     if ship_model.machinery_system.propulsion_type == PropulsionType.ELECTRIC:
-        assert performance_data.power_source_data.mechanical_system.power_on_source_kw == 0, "fail 1"
-        assert np.all(performance_data.power_source_data.electric_system.power_on_source_kw >
-                      performance_data.propeller_data.shaft_power_kw + auxiliary_power_kw), "fail 2"
+        assert (
+            performance_data.power_source_data.mechanical_system.power_on_source_kw == 0
+        ), "fail 1"
+        assert np.all(
+            performance_data.power_source_data.electric_system.power_on_source_kw
+            > performance_data.propeller_data.shaft_power_kw + auxiliary_power_kw
+        ), "fail 2"
     else:
-        assert np.all(performance_data.power_source_data.mechanical_system.power_on_source_kw >
-                      performance_data.propeller_data.shaft_power_kw)
-        assert np.all(performance_data.power_source_data.electric_system.power_on_source_kw >=
-                      auxiliary_power_kw)
+        assert np.all(
+            performance_data.power_source_data.mechanical_system.power_on_source_kw
+            > performance_data.propeller_data.shaft_power_kw
+        )
+        assert np.all(
+            performance_data.power_source_data.electric_system.power_on_source_kw
+            >= auxiliary_power_kw
+        )
     assert np.allclose(
         performance_data_backward.power_source_data.total.fuel_consumption.total_fuel_consumption,
-        performance_data.power_source_data.total.fuel_consumption.total_fuel_consumption
+        performance_data.power_source_data.total.fuel_consumption.total_fuel_consumption,
     )
-    assert np.allclose(performance_data_backward.hull_data.vessel_speed_kn, speed_array_kn)
+    assert np.allclose(
+        performance_data_backward.hull_data.vessel_speed_kn, speed_array_kn
+    )
     assert np.allclose(
         performance_data_backward.propeller_data.shaft_power_kw,
-        performance_data.propeller_data.shaft_power_kw
+        performance_data.propeller_data.shaft_power_kw,
     )
     assert np.allclose(
         performance_data_backward.propeller_data.n_rpm,
-        performance_data.propeller_data.n_rpm
+        performance_data.propeller_data.n_rpm,
     )
 
 
@@ -66,7 +83,7 @@ def verify_ship_model_performance(ship_model: ShipModel, speed_array_kn: np.ndar
 def calm_water_resistance() -> CalmWaterResistanceBySpeedPowerCurve:
     design_speed_kn = 20
     speed_ref_array = np.linspace(0, design_speed_kn, 21)
-    power_ref_array = 10000 * 0.85 / design_speed_kn ** 3 * speed_ref_array ** 3
+    power_ref_array = 10000 * 0.85 / design_speed_kn**3 * speed_ref_array**3
     return CalmWaterResistanceBySpeedPowerCurve(
         speed_ref_kn=speed_ref_array,
         power_ref_kw=power_ref_array,
@@ -74,10 +91,13 @@ def calm_water_resistance() -> CalmWaterResistanceBySpeedPowerCurve:
 
 
 @pytest.fixture
-def calm_water_resistance_hollenbach(ship_dimension) \
-        -> CalmWaterResistanceHollenbachTwinScrewDesignDraft:
+def calm_water_resistance_hollenbach(
+    ship_dimension,
+) -> CalmWaterResistanceHollenbachTwinScrewDesignDraft:
     """Return the calm water resistance model for the Hollenbach twin screw design draft."""
-    return CalmWaterResistanceHollenbachTwinScrewDesignDraft(ship_dimensions=ship_dimension)
+    return CalmWaterResistanceHollenbachTwinScrewDesignDraft(
+        ship_dimensions=ship_dimension
+    )
 
 
 @pytest.fixture
@@ -90,6 +110,7 @@ def machinery_system() -> MachinerySystem:
         rated_power_source_kw=10000,
     )
 
+
 @pytest.fixture
 def propulsor_b_series() -> PropulsorDataBseries:
     return PropulsorDataBseries(
@@ -101,7 +122,7 @@ def propulsor_b_series() -> PropulsorDataBseries:
 
 
 def test_ship_model_get_performance_data_from_speed_and_vice_versa(
-        calm_water_resistance, machinery_system
+    calm_water_resistance, machinery_system
 ):
     """Test ShipModel.get_performance_data_from_speed and ShipMode.get_performance_from_power."""
     # Test with the electric propulsion system
@@ -176,9 +197,8 @@ def ship_dimension() -> ShipDimension:
         dp_diameter_propeller_m=4.5,
         has_bulb=False,
         number_rudders=2,
-        av_transverse_area_above_water_line_m2=700
+        av_transverse_area_above_water_line_m2=700,
     )
-
 
 
 def test_propulsion_point_calculation(calm_water_resistance_hollenbach):
@@ -211,10 +231,10 @@ def test_propulsion_point_calculation(calm_water_resistance_hollenbach):
 
 
 def test_zero_speed(
-        calm_water_resistance,
-        calm_water_resistance_hollenbach,
-        machinery_system,
-        ship_dimension
+    calm_water_resistance,
+    calm_water_resistance_hollenbach,
+    machinery_system,
+    ship_dimension,
 ):
     for vessel_speed_kn in [0, np.zeros(3)]:
         ship_model = ShipModel(
@@ -222,18 +242,36 @@ def test_zero_speed(
             propulsor=PropulsorDataScalar(efficiency=0.7),
             machinery_system=machinery_system,
         )
-        ship_performance_data = ship_model.get_ship_performance_data_from_speed(vessel_speed_kn)
-        assert np.all(np.atleast_1d(ship_performance_data.hull_data.total_resistance_newton) == 0)
-        assert np.all(np.atleast_1d(ship_performance_data.propeller_data.propeller_thrust_newton) == 0)
+        ship_performance_data = ship_model.get_ship_performance_data_from_speed(
+            vessel_speed_kn
+        )
+        assert np.all(
+            np.atleast_1d(ship_performance_data.hull_data.total_resistance_newton) == 0
+        )
+        assert np.all(
+            np.atleast_1d(ship_performance_data.propeller_data.propeller_thrust_newton)
+            == 0
+        )
         assert np.all(np.atleast_1d(ship_performance_data.propeller_data.n_rpm) == 0)
-        assert np.all(np.atleast_1d(ship_performance_data.propeller_data.shaft_power_kw) == 0)
+        assert np.all(
+            np.atleast_1d(ship_performance_data.propeller_data.shaft_power_kw) == 0
+        )
 
         ship_model.calm_water_resistance = calm_water_resistance
-        ship_performance_data = ship_model.get_ship_performance_data_from_speed(vessel_speed_kn)
-        assert np.all(np.atleast_1d(ship_performance_data.hull_data.total_resistance_newton) == 0)
-        assert np.all(np.atleast_1d(ship_performance_data.propeller_data.propeller_thrust_newton) == 0)
+        ship_performance_data = ship_model.get_ship_performance_data_from_speed(
+            vessel_speed_kn
+        )
+        assert np.all(
+            np.atleast_1d(ship_performance_data.hull_data.total_resistance_newton) == 0
+        )
+        assert np.all(
+            np.atleast_1d(ship_performance_data.propeller_data.propeller_thrust_newton)
+            == 0
+        )
         assert np.all(np.atleast_1d(ship_performance_data.propeller_data.n_rpm) == 0)
-        assert np.all(np.atleast_1d(ship_performance_data.propeller_data.shaft_power_kw) == 0)
+        assert np.all(
+            np.atleast_1d(ship_performance_data.propeller_data.shaft_power_kw) == 0
+        )
 
 
 def test_added_resistance_all(
@@ -241,7 +279,7 @@ def test_added_resistance_all(
     added_resistance_snnm,
     added_resistance_wind,
     propulsor_b_series,
-    machinery_system
+    machinery_system,
 ):
     ship_model = ShipModel(
         calm_water_resistance=calm_water_resistance_hollenbach,
@@ -259,7 +297,7 @@ def test_added_resistance_all(
             wind_direction_deg=35,
         ),
         heading_deg=0,
-        auxiliary_power_kw=1000
+        auxiliary_power_kw=1000,
     )
     assert ship_performance_data.hull_data.total_resistance_newton > 0
     assert ship_performance_data.hull_data.calm_water_resistance_newton > 0
@@ -274,7 +312,7 @@ def test_added_resistance_all(
             mean_wave_period_s=9,
         ),
         heading_deg=0,
-        auxiliary_power_kw=1000
+        auxiliary_power_kw=1000,
     )
     assert ship_performance_data.hull_data.total_resistance_newton > 0
     assert ship_performance_data.hull_data.calm_water_resistance_newton > 0
@@ -291,7 +329,7 @@ def test_added_resistance_all(
             wind_direction_deg=0,
         ),
         heading_deg=0,
-        auxiliary_power_kw=1000
+        auxiliary_power_kw=1000,
     )
     assert ship_performance_data.hull_data.total_resistance_newton > 0
     assert ship_performance_data.hull_data.calm_water_resistance_newton > 0
@@ -305,14 +343,16 @@ def added_resistance_by_sea_margin_constant():
         significant_wave_height_m=np.array([0, 1000]),
     )
 
+
 @pytest.fixture
 def added_resistance_by_sea_margin_curve():
     significant_wave_heights = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    sea_margin_perc = significant_wave_heights ** 2 * 4
+    sea_margin_perc = significant_wave_heights**2 * 4
     return AddedResistanceBySeaMarginCurve(
         sea_margin_perc=sea_margin_perc,
         significant_wave_height_m=significant_wave_heights,
     )
+
 
 def test_added_resistance_by_sea_margin(
     calm_water_resistance_hollenbach,
@@ -326,11 +366,11 @@ def test_added_resistance_by_sea_margin(
     )
     ship_performance_data = ship_model.get_ship_performance_data_from_speed(
         vessel_speed_kn=14,
-        weather=Weather(significant_wave_height_m=10 * random.random())
+        weather=Weather(significant_wave_height_m=10 * random.random()),
     )
     assert np.allclose(
         ship_performance_data.hull_data.added_resistance_wave_newton,
-        ship_performance_data.hull_data.calm_water_resistance_newton * 0.15
+        ship_performance_data.hull_data.calm_water_resistance_newton * 0.15,
     )
 
     wave_height = 10 * random.random()
@@ -343,10 +383,11 @@ def test_added_resistance_by_sea_margin(
         added_resistance_wave=added_resistance_by_sea_margin_curve,
     )
     ship_performance_data = ship_model.get_ship_performance_data_from_speed(
-        vessel_speed_kn=14,
-        weather=Weather(significant_wave_height_m=wave_height)
+        vessel_speed_kn=14, weather=Weather(significant_wave_height_m=wave_height)
     )
     assert np.allclose(
         ship_performance_data.hull_data.added_resistance_wave_newton,
-        ship_performance_data.hull_data.calm_water_resistance_newton * sea_margin_percent / 100
+        ship_performance_data.hull_data.calm_water_resistance_newton
+        * sea_margin_percent
+        / 100,
     )
