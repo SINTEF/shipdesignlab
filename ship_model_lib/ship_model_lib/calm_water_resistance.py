@@ -388,9 +388,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
 
     @property
     def _fn_critical(self) -> float:
-        cb_poly = np.array(
-            [1, self.cb_block_coefficient, self.cb_block_coefficient**2]
-        )
+        cb_poly = np.array([1, self.cb_block_coefficient, self.cb_block_coefficient**2])
         return np.dot(self._coeff_for_critical_froude_number, cb_poly)
 
     @abstractmethod
@@ -409,9 +407,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         fn_poly[1, :] = fn
         fn_poly[2, :] = fn**2
         result = np.matmul(coeff, fn_poly)
-        cb_poly = np.array(
-            [1, self.cb_block_coefficient, self.cb_block_coefficient**2]
-        )
+        cb_poly = np.array([1, self.cb_block_coefficient, self.cb_block_coefficient**2])
         result = np.dot(cb_poly, result)
         if len(result) == 1:
             return result[0]
@@ -494,12 +490,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         )
         c_f = self._get_c_f(velocity)
         r_app = (
-            0.5
-            * self.rho_seawater
-            * velocity**2
-            * area_appendage
-            * equiv_factor
-            * c_f
+            0.5 * self.rho_seawater * velocity**2 * area_appendage * equiv_factor * c_f
         )
         r_th = self._get_r_th(velocity)
         return (r_app + r_th) / (

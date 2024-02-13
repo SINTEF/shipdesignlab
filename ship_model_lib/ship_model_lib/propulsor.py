@@ -538,10 +538,7 @@ class PropulsorDataBseries(PropulsorDataOpenWater):
                 + self._dKT[2] * self._ear * self._pod * j
                 + self._dKT[3] * (np.log(self._re) - 0.301) ** 2 * self._ear * j**2
                 + self._dKT[4] * (np.log(self._re) - 0.301) * self._pod**6 * j * 2
-                + self._dKT[5]
-                * (np.log(self._re) - 0.301) ** 2
-                * self._pod**6
-                * j**2
+                + self._dKT[5] * (np.log(self._re) - 0.301) ** 2 * self._pod**6 * j**2
                 + self._dKT[6]
                 * (np.log(self._re) - 0.301) ** 2
                 * self._z
@@ -569,11 +566,7 @@ class PropulsorDataBseries(PropulsorDataOpenWater):
                 + self._dKQ[4] * (np.log(self._re) - 0.301) * self._pod
                 + self._dKQ[5] * (np.log(self._re) - 0.301) * self._pod**2
                 + self._dKQ[6] * (np.log(self._re) - 0.301) ** 2 * self._pod**2
-                + self._dKQ[7]
-                * (np.log(self._re) - 0.301)
-                * self._z
-                * self._ear
-                * j**2
+                + self._dKQ[7] * (np.log(self._re) - 0.301) * self._z * self._ear * j**2
                 + self._dKQ[8]
                 * (np.log(self._re) - 0.301) ** 2
                 * self._z

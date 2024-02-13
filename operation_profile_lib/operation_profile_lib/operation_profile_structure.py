@@ -163,33 +163,51 @@ class Weather:
                 "Only one significant_wave_height_m is allowed for conversion to proto"
             )
         return proto.Weather(
-            significant_wave_height_m=self.significant_wave_height_m[0]
-            if self.significant_wave_height_m is not None
-            else None,
-            mean_wave_period_s=self.mean_wave_period_s[0]
-            if self.mean_wave_period_s is not None
-            else None,
-            wave_direction_deg=self.wave_direction_deg[0]
-            if self.wave_direction_deg is not None
-            else None,
-            wind_speed_m_per_s=self.wind_speed_m_per_s[0]
-            if self.wind_speed_m_per_s is not None
-            else None,
-            wind_direction_deg=self.wind_direction_deg[0]
-            if self.wind_direction_deg is not None
-            else None,
-            ocean_current_speed_m_per_s=self.ocean_current_speed_m_per_s[0]
-            if self.ocean_current_speed_m_per_s is not None
-            else None,
-            ocean_current_direction_deg=self.ocean_current_direction_deg[0]
-            if self.ocean_current_direction_deg is not None
-            else None,
-            air_temperature_deg_c=self.air_temperature_deg_c[0]
-            if self.air_temperature_deg_c is not None
-            else None,
-            sea_water_temperature_deg_c=self.sea_water_temperature_deg_c[0]
-            if self.sea_water_temperature_deg_c is not None
-            else None,
+            significant_wave_height_m=(
+                self.significant_wave_height_m[0]
+                if self.significant_wave_height_m is not None
+                else None
+            ),
+            mean_wave_period_s=(
+                self.mean_wave_period_s[0]
+                if self.mean_wave_period_s is not None
+                else None
+            ),
+            wave_direction_deg=(
+                self.wave_direction_deg[0]
+                if self.wave_direction_deg is not None
+                else None
+            ),
+            wind_speed_m_per_s=(
+                self.wind_speed_m_per_s[0]
+                if self.wind_speed_m_per_s is not None
+                else None
+            ),
+            wind_direction_deg=(
+                self.wind_direction_deg[0]
+                if self.wind_direction_deg is not None
+                else None
+            ),
+            ocean_current_speed_m_per_s=(
+                self.ocean_current_speed_m_per_s[0]
+                if self.ocean_current_speed_m_per_s is not None
+                else None
+            ),
+            ocean_current_direction_deg=(
+                self.ocean_current_direction_deg[0]
+                if self.ocean_current_direction_deg is not None
+                else None
+            ),
+            air_temperature_deg_c=(
+                self.air_temperature_deg_c[0]
+                if self.air_temperature_deg_c is not None
+                else None
+            ),
+            sea_water_temperature_deg_c=(
+                self.sea_water_temperature_deg_c[0]
+                if self.sea_water_temperature_deg_c is not None
+                else None
+            ),
         )
 
     def to_dict(self) -> dict:
@@ -218,33 +236,51 @@ class Weather:
         """Converts the weather to a dictionary with scalar values. If the weather has timeseries,
         the first value is returned"""
         return {
-            "significant_wave_height_m": self.significant_wave_height_m[0]
-            if self.significant_wave_height_m is not None
-            else None,
-            "mean_wave_period_s": self.mean_wave_period_s[0]
-            if self.mean_wave_period_s is not None
-            else None,
-            "wave_direction_deg": self.wave_direction_deg[0]
-            if self.wave_direction_deg is not None
-            else None,
-            "wind_speed_m_per_s": self.wind_speed_m_per_s[0]
-            if self.wind_speed_m_per_s is not None
-            else None,
-            "wind_direction_deg": self.wind_direction_deg[0]
-            if self.wind_direction_deg is not None
-            else None,
-            "ocean_current_speed_m_per_s": self.ocean_current_speed_m_per_s[0]
-            if self.ocean_current_speed_m_per_s is not None
-            else None,
-            "ocean_current_direction_deg": self.ocean_current_direction_deg[0]
-            if self.ocean_current_direction_deg is not None
-            else None,
-            "air_temperature_deg_c": self.air_temperature_deg_c[0]
-            if self.air_temperature_deg_c is not None
-            else None,
-            "sea_water_temperature_deg_c": self.sea_water_temperature_deg_c[0]
-            if self.sea_water_temperature_deg_c is not None
-            else None,
+            "significant_wave_height_m": (
+                self.significant_wave_height_m[0]
+                if self.significant_wave_height_m is not None
+                else None
+            ),
+            "mean_wave_period_s": (
+                self.mean_wave_period_s[0]
+                if self.mean_wave_period_s is not None
+                else None
+            ),
+            "wave_direction_deg": (
+                self.wave_direction_deg[0]
+                if self.wave_direction_deg is not None
+                else None
+            ),
+            "wind_speed_m_per_s": (
+                self.wind_speed_m_per_s[0]
+                if self.wind_speed_m_per_s is not None
+                else None
+            ),
+            "wind_direction_deg": (
+                self.wind_direction_deg[0]
+                if self.wind_direction_deg is not None
+                else None
+            ),
+            "ocean_current_speed_m_per_s": (
+                self.ocean_current_speed_m_per_s[0]
+                if self.ocean_current_speed_m_per_s is not None
+                else None
+            ),
+            "ocean_current_direction_deg": (
+                self.ocean_current_direction_deg[0]
+                if self.ocean_current_direction_deg is not None
+                else None
+            ),
+            "air_temperature_deg_c": (
+                self.air_temperature_deg_c[0]
+                if self.air_temperature_deg_c is not None
+                else None
+            ),
+            "sea_water_temperature_deg_c": (
+                self.sea_water_temperature_deg_c[0]
+                if self.sea_water_temperature_deg_c is not None
+                else None
+            ),
         }
 
 
@@ -318,17 +354,19 @@ class OperationPoint:
                 "Only one timestamp_seconds is allowed for conversion to proto"
             )
         return proto.OperationPoint(
-            timestamp_seconds=self.timestamp_seconds[0]
-            if self.timestamp_seconds is not None
-            else None,
+            timestamp_seconds=(
+                self.timestamp_seconds[0]
+                if self.timestamp_seconds is not None
+                else None
+            ),
             speed_kn=self.speed_kn[0] if self.speed_kn is not None else None,
-            power_limit_kw=self.power_limit_kw[0]
-            if self.power_limit_kw is not None
-            else None,
+            power_limit_kw=(
+                self.power_limit_kw[0] if self.power_limit_kw is not None else None
+            ),
             heading_deg=self.heading_deg[0] if self.heading_deg is not None else None,
-            auxiliary_power=self.auxiliary_power[0]
-            if self.auxiliary_power is not None
-            else None,
+            auxiliary_power=(
+                self.auxiliary_power[0] if self.auxiliary_power is not None else None
+            ),
             weather=self.weather.to_proto() if self.weather is not None else None,
             location=self.location.to_proto() if self.location is not None else None,
         )
@@ -349,23 +387,25 @@ class OperationPoint:
         """Converts the operation point to a dictionary with scalar values.
         If the values are arrays, the first value is used."""
         return {
-            "timestamp_seconds": self.timestamp_seconds[0]
-            if self.timestamp_seconds is not None
-            else None,
+            "timestamp_seconds": (
+                self.timestamp_seconds[0]
+                if self.timestamp_seconds is not None
+                else None
+            ),
             "speed_kn": self.speed_kn[0] if self.speed_kn is not None else None,
-            "power_limit_kw": self.power_limit_kw[0]
-            if self.power_limit_kw is not None
-            else None,
-            "heading_deg": self.heading_deg[0]
-            if self.heading_deg is not None
-            else None,
-            "auxiliary_power": self.auxiliary_power[0]
-            if self.auxiliary_power is not None
-            else None,
-            "weather": self.weather.to_dict_scalar()
-            if self.weather is not None
-            else None,
-            "location": self.location.to_dict_scalar()
-            if self.location is not None
-            else None,
+            "power_limit_kw": (
+                self.power_limit_kw[0] if self.power_limit_kw is not None else None
+            ),
+            "heading_deg": (
+                self.heading_deg[0] if self.heading_deg is not None else None
+            ),
+            "auxiliary_power": (
+                self.auxiliary_power[0] if self.auxiliary_power is not None else None
+            ),
+            "weather": (
+                self.weather.to_dict_scalar() if self.weather is not None else None
+            ),
+            "location": (
+                self.location.to_dict_scalar() if self.location is not None else None
+            ),
         }
