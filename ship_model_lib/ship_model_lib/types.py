@@ -1,4 +1,5 @@
 """This module contains the types used by the ship model library."""
+
 from enum import Enum
 
 
