@@ -1,6 +1,22 @@
 {
   "packages": {
-    ".": {
+    "operation_profile_lib": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false
+    },
+    "ship_model_lib": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false
+    },
+    "ship_performance_service_interface": {
       "changelog-path": "CHANGELOG.md",
       "release-type": "python",
       "bump-minor-pre-major": false,

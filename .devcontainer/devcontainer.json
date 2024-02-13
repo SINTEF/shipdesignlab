@@ -21,7 +21,8 @@
 		"vscode": {
 			"extensions": [
 				"GitHub.vscode-github-actions",
-				"ms-python.black-formatter"
+				"ms-python.black-formatter",
+				"ms-toolsai.jupyter"
 			]
 		}
 	},
