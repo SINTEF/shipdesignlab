@@ -1,5 +1,12 @@
 name: Run nbdev_test on all projects
 
+on:
+  # Runs on pushes to any branch
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+
 jobs:
   test:
     runs-on: ubuntu-latest
