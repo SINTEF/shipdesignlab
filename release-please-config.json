@@ -11,7 +11,7 @@
       "include-component-in-tag": true,
       "package-name": "operation_profile_lib",
       "extra-files": [
-        "operation_profile_lib/settings.ini"
+        "settings.ini"
       ]
     },
     "ship_model_lib": {
@@ -23,7 +23,7 @@
       "prerelease": false,
       "package-name": "ship_model_lib",
       "extra-files": [
-        "ship_model_lib/settings.ini"
+        "settings.ini"
       ]
     },
     "ship_performance_service_interface": {
