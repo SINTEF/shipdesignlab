@@ -1,5 +1,5 @@
 {
-  "operation_profile_lib": "0.1.11",
-  "ship_model_lib": "0.6.10",
-  "ship_performance_service_interface": "1.1.8"
+  "operation_profile_lib": "0.1.12",
+  "ship_model_lib": "0.6.11",
+  "ship_performance_service_interface": "1.1.9"
 }
