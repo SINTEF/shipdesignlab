@@ -13,54 +13,58 @@ name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    outputs:
-      releases_created: ${{ steps.release.outputs.releases_created }}
-      operation_profile_lib--release_created: ${{ steps.release.outputs.operation_profile_lib--release_created }}
-      ship_model_lib--release_created: ${{ steps.release.outputs.ship_model_lib--release_created }}
-      ship_performance_service_interface--release_created: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
     steps:
-        - uses: google-github-actions/release-please-action@v4
-          id: release
-          with:
-            # this assumes that you have created a personal access token
-            # (PAT) and configured it as a GitHub action secret named
-            token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-            config-file: release-please-config.json
-            manifest-file: .release-please-manifest.json
-            include-component-in-tag: true
-        - name: Print the output
-          run: echo "The time was $ALLOUTPUT"
-          env:
-            ALLOUTPUT: ${{ toJSON(steps.release.outputs) }}
-        
-  publish:
-    needs: release-please
-    runs-on: ubuntu-latest
-    steps:
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        with:
+          # this assumes that you have created a personal access token
+          # (PAT) and configured it as a GitHub action secret named
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          include-component-in-tag: true
       - name: Print the output
-        run: echo "The time was $ALLOUTPUT"
+        run: echo "The output was $ALLOUTPUT"
         env:
-          ALLOUTPUT: ${{ toJSON(job.release-please.outputs) }}
+          ALLOUTPUT: ${{ toJSON(steps.release.outputs) }}
       - uses: actions/checkout@v4
-        if: ${{ job.release-please.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created }}
       - name: Set up Python
         uses: actions/setup-python@v4
-        if: ${{ job.release-please.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           python-version: "3.12"
       - name: Install pypa/build
-        if: ${{ job.release-please.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created }}
         run: >-
           python3 -m
           pip install
           build
           --user
+      - name: Build operation_profile_lib
+        if: ${{ steps.release.outputs.operation_profile_lib--release_created }}
+        run: python3 -m build
+        working-directory: operation_profile_lib
+      - name: Publish operation_profile_lib to PyPI
+        if: ${{ steps.release.outputs.operation_profile_lib--release_created }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ship_model_lib/dist
+      - name: Build ship_model_lib
+        if: ${{ steps.release.outputs.ship_model_lib--release_created }}
+        run: python3 -m build
+        working-directory: ship_model_lib
+      - name: Publish ship_model_lib to PyPI
+        if: ${{ steps.release.outputs.ship_model_lib--release_created }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ship_model_lib/dist
       - name: Build ship_performance_service_interface
-        if: ${{ job.release-please.outputs.ship_performance_service_interface--release_created }}
+        if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
         run: python3 -m build
         working-directory: ship_performance_service_interface
       - name: Publish ship_performance_service_interface to PyPI
-        if: ${{ job.release-please.outputs.ship_performance_service_interface--release_created }}
+        if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: ship_performance_service_interface/dist
