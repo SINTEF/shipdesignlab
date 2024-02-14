@@ -23,6 +23,9 @@ jobs:
             token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
             config-file: release-please-config.json
             manifest-file: .release-please-manifest.json
+            include-component-in-tag: true
+        - name: Print the output
+          run: echo "The time was ${{ steps.release.outputs }}"
         - uses: actions/checkout@v4
           if: ${{ steps.release.outputs.release_created }}
         - name: Set up Python
