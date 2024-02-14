@@ -25,7 +25,9 @@ jobs:
             manifest-file: .release-please-manifest.json
             include-component-in-tag: true
         - name: Print the output
-          run: echo "The time was ${{ toJSON(steps.release.outputs) }}"
+          run: echo "The time was $ALLOUTPUT"
+          env:
+            ALLOUTPUT: ${{ toJSON(steps.release.outputs) }}
         - uses: actions/checkout@v4
           if: ${{ steps.release.outputs.release_created }}
         - name: Set up Python
