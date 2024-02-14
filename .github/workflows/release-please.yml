@@ -14,7 +14,10 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      releases: ${{ steps.release.outputs }}
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      operation_profile_lib--release_created: ${{ steps.release.outputs.operation_profile_lib--release_created }}
+      ship_model_lib--release_created: ${{ steps.release.outputs.ship_model_lib--release_created }}
+      ship_performance_service_interface--release_created: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
     steps:
         - uses: google-github-actions/release-please-action@v4
           id: release
@@ -29,29 +32,7 @@ jobs:
           run: echo "The time was $ALLOUTPUT"
           env:
             ALLOUTPUT: ${{ toJSON(steps.release.outputs) }}
-        - uses: actions/checkout@v4
-          if: ${{ steps.release.outputs.releases_created }}
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          if: ${{ steps.release.outputs.releases_created }}
-          with:
-            python-version: "3.12"
-        - name: Install pypa/build
-          if: ${{ steps.release.outputs.releases_created }}
-          run: >-
-            python3 -m
-            pip install
-            build
-            --user
-        - name: Build ship_performance_service_interface
-          if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
-          run: python3 -m build
-          working-directory: ship_performance_service_interface
-        - name: Publish ship_performance_service_interface to PyPI
-          if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
-          uses: pypa/gh-action-pypi-publish@release/v1
-          with:
-            packages-dir: ship_performance_service_interface/dist
+        
   publish:
     needs: release-please
     runs-on: ubuntu-latest
@@ -59,4 +40,27 @@ jobs:
       - name: Print the output
         run: echo "The time was $ALLOUTPUT"
         env:
-          ALLOUTPUT: ${{ toJSON(job.release-please.outputs.releases) }}
+          ALLOUTPUT: ${{ toJSON(job.release-please.outputs) }}
+      - uses: actions/checkout@v4
+        if: ${{ job.release-please.outputs.releases_created }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        if: ${{ job.release-please.outputs.releases_created }}
+        with:
+          python-version: "3.12"
+      - name: Install pypa/build
+        if: ${{ job.release-please.outputs.releases_created }}
+        run: >-
+          python3 -m
+          pip install
+          build
+          --user
+      - name: Build ship_performance_service_interface
+        if: ${{ job.release-please.outputs.ship_performance_service_interface--release_created }}
+        run: python3 -m build
+        working-directory: ship_performance_service_interface
+      - name: Publish ship_performance_service_interface to PyPI
+        if: ${{ job.release-please.outputs.ship_performance_service_interface--release_created }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ship_performance_service_interface/dist
