@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.7](https://github.com/SINTEF/shipdesignlab/compare/ship_performance_service_interface-v1.1.6...ship_performance_service_interface-v1.1.7) (2024-02-14)
+
+
+### Bug Fixes
+
+* try again ([2f74bbe](https://github.com/SINTEF/shipdesignlab/commit/2f74bbefe3db177d83f9a8ae2f8d070fc263e740))
+
 ## [1.1.6](https://github.com/SINTEF/shipdesignlab/compare/ship_performance_service_interface-v1.1.5...ship_performance_service_interface-v1.1.6) (2024-02-14)
 
 
