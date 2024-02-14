@@ -1,6 +1,6 @@
 [project]
 name = "ship_performance_service_interface"
-version = "1.1.4"
+version = "1.1.5"
 authors = [
   { name="Jørgen Bremnes Nielsen", email="jorgen.b.nielsen@sintef.no" },
 ]
