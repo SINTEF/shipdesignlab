@@ -12,11 +12,38 @@ name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write 
     steps:
         - uses: google-github-actions/release-please-action@v4
+          id: release
           with:
             # this assumes that you have created a personal access token
             # (PAT) and configured it as a GitHub action secret named
             token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
             config-file: release-please-config.json
             manifest-file: .release-please-manifest.json
+        - uses: actions/checkout@v4
+          if: ${{ steps.release.outputs.release_created }}
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          if: ${{ steps.release.outputs.release_created }}
+          with:
+            python-version: "3.12"
+        - name: Install pypa/build
+          if: ${{ steps.release.outputs.release_created }}
+          run: >-
+            python3 -m
+            pip install
+            build
+            --user
+        - name: Build ship_performance_service_interface
+          if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
+          run: python3 -m build
+          working-directory: ship_performance_service_interface
+        - name: Publish ship_performance_service_interface to PyPI
+          if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
+          uses: pypa/gh-action-pypi-publish@release/v1
+          with:
+            repository-url: https://test.pypi.org/legacy/
+            packages-dir: ship_performance_service_interface/dist
