@@ -13,6 +13,8 @@ name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      releases: ${{ steps.release.outputs }}
     steps:
         - uses: google-github-actions/release-please-action@v4
           id: release
@@ -49,5 +51,12 @@ jobs:
           if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
           uses: pypa/gh-action-pypi-publish@release/v1
           with:
-            repository-url: https://test.pypi.org/legacy/
             packages-dir: ship_performance_service_interface/dist
+  publish:
+    needs: release-please
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print the output
+        run: echo "The time was $ALLOUTPUT"
+        env:
+          ALLOUTPUT: ${{ toJSON(job.release-please.outputs.releases) }}
