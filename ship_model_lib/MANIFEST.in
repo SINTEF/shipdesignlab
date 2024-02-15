@@ -1,0 +1,9 @@
+include dependencies/*.npy
+include settings.ini
+include LICENSE
+include CONTRIBUTING.md
+include README.md
+include ./dependencies/B_series_coefficients.npy
+include ./dependencies/Re_correction.npy
+include ./ship_model_lib/data/drag_coefficient.csv
+recursive-exclude * __pycache__

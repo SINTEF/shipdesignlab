@@ -1,0 +1,28 @@
+[project]
+name = "ship_performance_service_interface"
+version = "1.1.9"
+authors = [
+  { name="Jørgen Bremnes Nielsen", email="jorgen.b.nielsen@sintef.no" },
+]
+description = "protobuf interface for ship-performance-service"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  'grpcio-tools',
+]
+
+[project.urls]
+Homepage = "https://github.com/SINTEF/shipdesignlab"
+Issues = "https://github.com/SINTEF/shipdesignlab/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[options]
+packages=["ship_performance_service_interface_lib"]

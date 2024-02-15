@@ -1,0 +1,40 @@
+{
+  "include-component-in-tag": true,
+  "packages": {
+    "operation_profile_lib": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "include-component-in-tag": true,
+      "package-name": "operation_profile_lib",
+      "extra-files": [
+        "settings.ini"
+      ]
+    },
+    "ship_model_lib": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "package-name": "ship_model_lib",
+      "extra-files": [
+        "settings.ini"
+      ]
+    },
+    "ship_performance_service_interface": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "package-name": "ship_performance_service_interface"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

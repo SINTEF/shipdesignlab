@@ -1,0 +1,400 @@
+syntax = "proto3";
+
+package simpleShipService;
+
+service SimpleShip {
+  rpc get_ship_performance_data_from_speed (SpeedDataForCalculation) returns (PerformanceResults) {}
+  rpc get_ship_performance_data_from_power (PowerDataForCalculation) returns (PerformanceResults) {}
+  rpc get_ship_performance_data_from_operation_point (OperationDataForCalculation) returns (PerformanceResults) {}
+}
+
+message SpeedDataForCalculation {
+  ShipModelData ship_model_data = 1;
+  repeated Weather weather = 2;
+  repeated double vessel_speed_knots = 3;
+  repeated double heading_deg = 4;
+  repeated double auxiliary_power_kw = 5;
+}
+
+message PowerDataForCalculation {
+  ShipModelData ship_model_data = 1;
+  repeated Weather weather = 2;
+  repeated double power_out_source_kw = 3;
+  repeated double heading_deg = 4;
+  repeated double auxiliary_power_kw = 5;
+}
+
+message OperationDataForCalculation {
+  ShipModelData ship_model_data = 1;
+  repeated OperationPoint operation_point = 2;
+}
+
+message ShipModelData {
+  ShipDescription ship_description = 1;
+  oneof resistance {
+    ResistanceHollenbachDesignDraftSingleScrew hollenbach_design_draft_single_screw = 2;
+    ResistanceHollenbachBallastDraftSingleScrew hollenbach_ballast_draft_single_screw = 3;
+    ResistanceHollenbachDesignDraftTwinScrew hollenbach_design_draft_twin_screw = 4;
+    ResistanceSpeedPower speed_power = 5;
+    ResistanceSpeedResistance speed_resistance = 6;
+  }
+  oneof propulsor_data {
+    PropulsorDataBseries propulsor_data_bseries = 7;
+    PropulsorDataOpenWater propulsor_data_openwater = 8;
+    PropulsorDataScalarPropulsor propulsor_data_scalarefficiency = 9;
+  }
+  oneof power_system {
+    MachinerySystem machinery_system = 10;
+    MachinerySubSystemSimple machinery_sub_system_simple = 11;
+  }
+}
+
+message PerformanceResults {
+  repeated ShipCalculationResults ship_calculation_results = 1;
+}
+
+message ShipCalculationResults {
+  ShipDescription ship_description_result = 1;
+  HullOperatingPoint hull_operating_point = 2;
+  PropulsorOperatingPoint propulsor_operating_point = 3;
+  MachinerySystemResult machinery_system_result = 4;
+}
+
+enum ShipType {
+  ship_type_unknown = 0;
+  bulk_handysize = 1;
+  bulk_capesize = 2;
+  container = 3;
+  tanker = 4;
+  fishing = 5;
+  service = 6;
+  roro = 7;
+  ro_pax = 8;
+  liquid_gas = 9;
+  general_cargo = 10;
+  car_carrier = 11;
+  multi_purpose = 12;
+}
+
+enum HollenbachModel {
+  MODEL_UNKNOWN = 0;
+  MODEL_SINGLE_SCREW_DESIGN_DRAFT = 1;
+  MODEL_SINGLE_SCREW_BALLAST_DRAFT = 2;
+  MODEL_TWIN_SCREW_DESIGN_DRAFT = 3;
+}
+
+enum WaveSpectrum {
+  wave_spectrum_unknown = 0;
+  PIERSON_MOSKOWITZ_ITTC_1978 = 1;
+  JONSWAP_ITTC_1984 = 2;
+}
+
+enum PropulsionType {
+  propulsion_unknown = 0;
+  mechanical = 1;
+  electric = 2;
+  hybrid = 3;
+}
+
+enum FuelType {
+  fuel_unknown = 0;
+  diesel = 1;
+  hfo= 2;
+  natural_gas = 3;
+  hydrogen = 4;
+  ammonia = 5;
+  lpg = 6;
+  marine_gas_oil = 7;
+  methanol = 8;
+}
+
+message FuelByMassFraction {
+  repeated FuelType fuel_type = 1;
+  repeated double fuel_fraction = 2;
+}
+
+enum EmissionTypes {
+  emission_unknown = 0;
+  co2 = 1;
+  nox = 2;
+  sox = 3;
+  pm = 4;
+}
+
+message AddedResistanceStaWave2 {
+  WaveSpectrum spectrum = 1;
+}
+
+message AddedResistanceSeaMarginCurve {
+  repeated double sea_margin_perc = 1;
+  repeated double significant_wave_height_m = 2;
+}
+
+message AddedResistanceBySNNM {
+  WaveSpectrum spectrum = 1;
+  ShipType ship_type = 2;
+  double length_of_entrance = 3;
+  double length_of_run = 4;
+}
+
+message AddedResistanceWindITTC {
+  ShipType ship_type = 1;
+  double transverse_area_m2 = 2;
+  bool is_laden = 3;
+}
+
+message ShipDescription {
+  string name = 1;
+  ShipType ship_type = 2;
+}
+
+message ShipDimensions {
+  double b_beam_m = 1;
+  double lpp_length_between_perpendiculars_m = 2;
+  double los_length_over_surface_m = 3;
+  double lwl_length_water_line_m = 4;
+  double cb_block_coefficient = 5;
+  double ta_draft_aft_m = 6;
+  double tf_draft_forward_m = 7;
+  double wetted_surface_m2 = 8;
+  double av_transverse_area_above_water_line_m2 = 9;
+  double area_bilge_keel_m2 = 10;
+  double dp_diameter_propeller_m = 11;
+  double kyy_radius_gyration_in_lateral_direction_non_dim = 12;
+  double rho_seawater_kg_per_m3 = 13;
+  double rho_air_kg_per_m3 = 14;
+  double has_bulb= 15;
+  double number_rudders = 16;
+  double number_shaft_brackets = 17;
+  double number_shaft_bossings = 18;
+  double number_thrusters = 19;
+}
+
+message ResistanceHollenbachDesignDraftSingleScrew {
+  ShipDimensions ship_dimensions = 1;
+  oneof added_resistance {
+    AddedResistanceBySNNM added_resistance_by_snnm = 2;
+    AddedResistanceStaWave2 added_resistance_sta_wave2 = 3;
+    AddedResistanceSeaMarginCurve added_resistance_sea_margin_curve = 4;
+  }
+  AddedResistanceWindITTC added_resistance_wind_ittc = 5;
+}
+
+message ResistanceHollenbachBallastDraftSingleScrew {
+  ShipDimensions ship_dimensions = 1;
+  oneof added_resistance {
+    AddedResistanceBySNNM added_resistance_by_snnm = 2;
+    AddedResistanceStaWave2 added_resistance_sta_wave2 = 3;
+    AddedResistanceSeaMarginCurve added_resistance_sea_margin_curve = 4;
+  }
+  AddedResistanceWindITTC added_resistance_wind_ittc = 5;
+}
+
+message ResistanceHollenbachDesignDraftTwinScrew {
+  ShipDimensions ship_dimensions = 1;
+  oneof added_resistance {
+    AddedResistanceBySNNM added_resistance_by_snnm = 2;
+    AddedResistanceStaWave2 added_resistance_sta_wave2 = 3;
+    AddedResistanceSeaMarginCurve added_resistance_sea_margin_curve = 4;
+  }
+  AddedResistanceWindITTC added_resistance_wind_ittc = 5;
+}
+
+message ResistanceSpeedPower {
+  repeated double speed_ref_kn = 1;
+  repeated double power_ref_kw = 2;
+  AddedResistanceSeaMarginCurve added_resistance_sea_margin_curve = 3;
+  AddedResistanceWindITTC added_resistance_wind_ittc = 5;
+}
+
+message ResistanceSpeedResistance {
+  repeated double speed_ref_kn = 1;
+  repeated double resistance_ref_k_n = 2;
+  AddedResistanceSeaMarginCurve added_resistance_sea_margin_curve = 3;
+  AddedResistanceWindITTC added_resistance_wind_ittc = 5;
+}
+
+message WakeFactorThrustDeductionPoints {
+  repeated double wake_fraction_factor = 1;
+  repeated double thrust_deduction_factor = 2;
+  repeated double vessel_speed_kn = 3;
+}
+
+message OpenWaterPropellerCurvePoints {
+  repeated double kt = 1;
+  repeated double kq = 2;
+  repeated double j = 3;
+}
+
+message PropulsorDataBseries {
+  WakeFactorThrustDeductionPoints wake_thrust_reduction = 1;
+  double dp_diameter_propeller_m = 2;
+  double pd_pitch_diameter_ratio = 3;
+  double ear_blade_area_ratio = 4;
+  int32 z_blade_number = 5;
+  double rho = 6;
+}
+
+message PropulsorDataOpenWater {
+  OpenWaterPropellerCurvePoints open_water_propeller_curve_points = 1;
+  WakeFactorThrustDeductionPoints wake_thrust_reduction = 2;
+  double dp_diameter_propeller_m = 3;
+  double pitch_diameter_ratio = 4;
+  double rho = 5;
+}
+
+message PropulsorDataScalarPropulsor {
+  double efficiency = 2;
+}
+
+message Location {
+    double longitude = 1;
+    double latitude = 2;
+}
+
+message Weather {
+    optional double significant_wave_height_m = 1;
+    optional double mean_wave_period_s = 2;
+    optional double wave_direction_deg = 3;
+    optional double wind_speed_m_per_s = 4;
+    optional double wind_direction_deg = 5;
+    optional double ocean_current_speed_m_per_s = 6;
+    optional double ocean_current_direction_deg = 7;
+    optional double air_temperature_deg_c = 8;
+    optional double sea_water_temperature_deg_c = 9;
+}
+
+message OperationPoint {
+    int64 timestamp_seconds = 1;
+    double speed_kn = 2;
+    double power_limit_kw = 3;
+    double heading_deg = 4;
+    double auxiliary_power = 5;
+    optional Weather weather = 6;
+    optional Location location = 7;
+}
+
+message Scalar {
+  double y = 1;
+}
+
+message Curve {
+  repeated double x = 1;
+  repeated double y = 2;
+}
+
+message EmissionFactor {
+  EmissionTypes emission_type = 1;
+  oneof emission_factor {
+    Scalar emission_scalar = 2;
+    Curve emission_curve = 3;
+  }
+}
+
+message EmissionFactors {
+  repeated EmissionFactor emission_factors = 1;
+}
+
+message PowerSourceWithEfficiency {
+  FuelByMassFraction fuel = 1;
+  double rated_power_kw = 2;
+  oneof efficiency {
+    Scalar efficiency_scalar = 3;
+    Curve efficiency_curve = 4;
+  }
+  EmissionFactors emission_factors = 5;
+}
+
+message PowerSourceSpecificFuelConsumption {
+  FuelByMassFraction fuel = 1;
+  double rated_power = 2;
+  oneof efficiency {
+    Scalar specific_fuel_consumption_scalar = 3;
+    Curve specific_fuel_consumption_curve = 4;
+  }
+  EmissionFactors emission_factors = 5;
+}
+
+message PowerLoad {
+  double rated_power_kw = 1;
+  oneof efficiency {
+    Scalar efficiency_scalar = 2;
+    Curve efficiency_curve = 3;
+  }
+}
+
+message MachinerySubSystemSimple {
+  double efficiency = 1;
+  oneof power_source {
+    PowerSourceWithEfficiency power_source_with_efficiency = 2;
+    PowerSourceSpecificFuelConsumption power_source_with_specific_fuel_consumption = 3;
+  }
+  PowerLoad propulsion_load = 4;
+  PowerLoad auxiliary_load = 5;
+}
+
+message MachinerySystem {
+  PropulsionType propulsion_type = 1;
+  MachinerySubSystemSimple mechanical_sub_system_simple = 2;
+  MachinerySubSystemSimple electric_sub_system_simple = 3;
+}
+
+
+
+message PropulsorOperatingPoint {
+  double vessel_speed_kn = 1;
+  double n_rpm = 2;
+  double j = 3;
+  double wake_velocity_kn = 4;
+  double propeller_thrust_newton = 5;
+  double thrust_deduction_factor = 6;
+  double resistance_newton = 7;
+  double torque_newton_meter = 8;
+  double efficiency_open_water = 9;
+  double shaft_power_kw = 10;
+  double wake_fraction_factor = 11;
+  double efficiency_hull = 12;
+}
+
+message HullOperatingPoint {
+  double vessel_speed_kn = 1;
+  double calm_water_resistance_newton = 2;
+  double added_resistance_wind_newton = 3;
+  double added_resistance_wave_newton = 4;
+  double total_resistance_newton = 5;
+  double total_towing_power_kw = 6;
+}
+
+message FuelConsumption {
+  double diesel = 1;
+  double hfo = 2;
+  double natural_gas = 3;
+  double hydrogen = 4;
+  double ammonia = 5;
+  double lpg = 6;
+  double marine_gas_oil = 7;
+  double methanol = 8;
+  double total_fuel_consumption = 9;
+}
+
+message EmissionResult {
+  double co2 = 1;
+  double nox = 2;
+  double sox = 3;
+  double pm = 4;
+}
+
+message MachineryResult {
+  double power_on_source_kw = 1;
+  FuelConsumption fuel_consumption = 2;
+  EmissionResult emissions_result = 3;
+}
+
+message MachinerySystemResult {
+  MachineryResult total_machinery_result = 1;
+  MachineryResult mechanical_system_result = 2;
+  MachineryResult electric_system_result = 3;
+}
+
+
+

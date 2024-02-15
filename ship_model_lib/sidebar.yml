@@ -1,0 +1,9 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_CalmWaterResistance.ipynb
+      - 01_AddedResistance.ipynb
+      - 02_Propulsor.ipynb
+      - 03_Machinery.ipynb
+      - 04_utility.ipynb
