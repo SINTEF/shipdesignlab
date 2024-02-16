@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.12](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.11...ship_model_lib-v0.6.12) (2024-02-16)
+
+
+### Bug Fixes
+
+* add plotly as requirement ([d14c808](https://github.com/SINTEF/shipdesignlab/commit/d14c808d39df093511cac3e9d4d1342daee44bfa))
+
 ## [0.6.11](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.10...ship_model_lib-v0.6.11) (2024-02-14)
 
 
