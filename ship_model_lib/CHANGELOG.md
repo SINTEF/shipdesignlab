@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.13](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.12...ship_model_lib-v0.6.13) (2024-03-11)
+
+
+### Bug Fixes
+
+* set upper limit on requirements ([71300fd](https://github.com/SINTEF/shipdesignlab/commit/71300fd28cb4c4b81d5073ef307631567e6589ba))
+
 ## [0.6.12](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.11...ship_model_lib-v0.6.12) (2024-02-16)
 
 
