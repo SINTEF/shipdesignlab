@@ -1,0 +1,12 @@
+scipy~=1.13.0
+jupyter~=1.0.0
+jupyterlab~=3.6.0
+nbdev==2.3.12
+plotly~=5.13.0
+twine~=4.0.2
+keyring
+artifacts-keyring
+matplotlib~=3.8.4
+pytest~=7.2.1
+kaleido~=0.2.1
+tqdm~=4.62.3

@@ -5,7 +5,7 @@ kaleido~=0.2.1
 keyring
 matplotlib~=3.8.2
 mypy-protobuf~=3.4.0
-nbdev~=2.3.10
+nbdev~=2.3.12
 numpy~=1.26.0
 pandas~=2.2.0
 plotly~=5.13.0
