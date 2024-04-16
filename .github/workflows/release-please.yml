@@ -41,15 +41,6 @@ jobs:
           pip install
           build
           --user
-      - name: Build operation_profile_lib
-        if: ${{ steps.release.outputs.operation_profile_lib--release_created }}
-        run: python3 -m build
-        working-directory: operation_profile_lib
-      - name: Publish operation_profile_lib to PyPI
-        if: ${{ steps.release.outputs.operation_profile_lib--release_created }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: operation_profile_lib/dist
       - name: Build ship_model_lib
         if: ${{ steps.release.outputs.ship_model_lib--release_created }}
         run: python3 -m build
@@ -59,12 +50,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: ship_model_lib/dist
-      - name: Build ship_performance_service_interface
-        if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
-        run: python3 -m build
-        working-directory: ship_performance_service_interface
-      - name: Publish ship_performance_service_interface to PyPI
-        if: ${{ steps.release.outputs.ship_performance_service_interface--release_created }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: ship_performance_service_interface/dist
