@@ -50,7 +50,7 @@ from ship_model_lib.added_resistance import (
     AddedResistanceBySNNM,
     AddedResistanceWindITTC,
 )
-from operation_profile_lib.operation_profile_structure import Weather, OperationPoint
+from .operation_profile_structure import Weather, OperationPoint
 from .utility import kn_to_m_per_s, m_per_s_to_kn, Interpolated1DValue
 from ship_model_lib.machinery import (
     Point,

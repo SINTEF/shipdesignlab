@@ -2,10 +2,10 @@
 
 d = {
     "settings": {
-        "branch": "master",
+        "branch": "main",
         "doc_baseurl": "/ship_model_lib/",
         "doc_host": "https://developer.github.io",
-        "git_url": "https://github.com/developer/https://SintefOceanEnergySystem@dev.azure.com/SintefOceanEnergySystem/DesignLab/_git/ship_model_lib/",
+        "git_url": "https://github.com/developer/https://github.com/SINTEF/shipdesignlab/",
         "lib_path": "ship_model_lib",
     },
     "syms": {
@@ -714,6 +714,60 @@ d = {
             "ship_model_lib.machinery.PowerSourceWithSpecificFuelConsumption.get_specific_fuel_consumption_g_per_kwh": (
                 "machinery.html#powersourcewithspecificfuelconsumption.get_specific_fuel_consumption_g_per_kwh",
                 "ship_model_lib/machinery.py",
+            ),
+        },
+        "ship_model_lib.operation_profile_structure": {
+            "ship_model_lib.operation_profile_structure.Location": (
+                "operation_profile_structure.html#location",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Location.__init__": (
+                "operation_profile_structure.html#location.__init__",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Location.to_dict": (
+                "operation_profile_structure.html#location.to_dict",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Location.to_dict_scalar": (
+                "operation_profile_structure.html#location.to_dict_scalar",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.OperationPoint": (
+                "operation_profile_structure.html#operationpoint",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.OperationPoint.__init__": (
+                "operation_profile_structure.html#operationpoint.__init__",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.OperationPoint.to_dict": (
+                "operation_profile_structure.html#operationpoint.to_dict",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.OperationPoint.to_dict_scalar": (
+                "operation_profile_structure.html#operationpoint.to_dict_scalar",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Weather": (
+                "operation_profile_structure.html#weather",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Weather.__init__": (
+                "operation_profile_structure.html#weather.__init__",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Weather.get_weather_at_index": (
+                "operation_profile_structure.html#weather.get_weather_at_index",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Weather.to_dict": (
+                "operation_profile_structure.html#weather.to_dict",
+                "ship_model_lib/operation_profile_structure.py",
+            ),
+            "ship_model_lib.operation_profile_structure.Weather.to_dict_scalar": (
+                "operation_profile_structure.html#weather.to_dict_scalar",
+                "ship_model_lib/operation_profile_structure.py",
             ),
         },
         "ship_model_lib.propulsor": {

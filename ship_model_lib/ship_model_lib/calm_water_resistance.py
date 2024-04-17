@@ -203,7 +203,7 @@ from typing import List, Tuple, Union
 from enum import Enum
 
 # from mes_util.constants import KINEMATIC_VISCOSITY_WATER
-from .ship_dimensions import (
+from ship_model_lib.ship_dimensions import (
     ShipDimensionsHollenbachSingleScrew,
     ShipDimensionsHollenbachTwinScrew,
 )

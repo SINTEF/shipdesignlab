@@ -28,7 +28,7 @@ from typing import Optional, Union, Callable, List, TypeVar, NamedTuple
 import numpy as np
 from plotly.subplots import make_subplots
 from plotly.graph_objs import Figure as PlotlyFigure
-from ship_model_lib.utility import get_interpolation_1d_function, Interpolated1DValue
+from .utility import get_interpolation_1d_function, Interpolated1DValue
 from .types import PropulsionType, EmissionType
 
 Numeric = TypeVar("Numeric", np.ndarray, float)
@@ -94,6 +94,7 @@ class FuelByMassFraction:
     _CO2_LPG: float = 3.01
     _CO2_MGO: float = 3.15
     _CO2_Methanol = 1.37
+
     # kg CO2 / kg fuel from engineeringtoolbox.com
 
     def __post_init__(self):

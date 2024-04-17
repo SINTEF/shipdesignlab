@@ -14,9 +14,7 @@ jobs:
     strategy:
       matrix:
         project:
-          - operation_profile_lib
           - ship_model_lib
-          - ship_performance_service_interface
 
     steps:
       - name: Checkout repository

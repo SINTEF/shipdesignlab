@@ -29,14 +29,18 @@ from functools import cached_property
 from typing import Callable, Union, TypeVar, Tuple
 
 import pandas as pd
-from operation_profile_lib.operation_profile_structure import Weather
+from .operation_profile_structure import Weather
 from scipy import interpolate
 from scipy.special import jv, yv
 from scipy.integrate import quad, dblquad, simpson
 from scipy.special import gamma
 
 from .types import WaveSpectrumType, ShipType
-from .utility import get_interpolation_1d_function, Interpolated1DValue, kn_to_m_per_s
+from ship_model_lib.utility import (
+    get_interpolation_1d_function,
+    Interpolated1DValue,
+    kn_to_m_per_s,
+)
 from .ship_dimensions import ShipDimensionsAddedResistance
 import numpy as np
 

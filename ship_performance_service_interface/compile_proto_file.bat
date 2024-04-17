@@ -1,1 +1,0 @@
-python -m grpc_tools.protoc -I./protos --python_out=./ship_performance_service_interface_lib --grpc_python_out=./ship_performance_service_interface_lib ./protos/sps_interface.proto
