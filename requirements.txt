@@ -1,1 +1,2 @@
+-e ./ship_model_lib
 -r ./ship_model_lib/requirements.txt
