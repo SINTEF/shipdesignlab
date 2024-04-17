@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.13...ship_model_lib-v1.0.0) (2024-04-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* included operation-lib in ship_model_lib
+
+### Features
+
+* included operation-lib in ship_model_lib ([4594927](https://github.com/SINTEF/shipdesignlab/commit/4594927a1334c7b00e03b84f37f92a0d88cdf502))
+
 ## [0.6.13](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.12...ship_model_lib-v0.6.13) (2024-03-11)
 
 
