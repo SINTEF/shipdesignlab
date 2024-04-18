@@ -50,7 +50,7 @@ from ship_model_lib.added_resistance import (
     AddedResistanceBySNNM,
     AddedResistanceWindITTC,
 )
-from .operation_profile_structure import Weather, OperationPoint
+from .operation_profile_structure import Weather, OperationPoint, Location
 from .utility import kn_to_m_per_s, m_per_s_to_kn, Interpolated1DValue
 from ship_model_lib.machinery import (
     Point,
@@ -460,7 +460,7 @@ class ShipModel:
         :param operation_point: The operating point
         :return: The ship performance data
         """
-        performance_data_from_speed = self.get_ship_performance_data_from_speed(
+        performance_data = self.get_ship_performance_data_from_speed(
             vessel_speed_kn=operation_point.speed_kn,
             weather=operation_point.weather,
             heading_deg=operation_point.heading_deg,
@@ -470,34 +470,107 @@ class ShipModel:
         if self.machinery_system is not None:
             if self.machinery_system.propulsion_type is PropulsionType.MECHANICAL:
                 power_on_source_kw = (
-                    performance_data_from_speed.power_source_data.mechanical_system.power_on_source_kw
+                    performance_data.power_source_data.mechanical_system.power_on_source_kw
                 )
             elif self.machinery_system.propulsion_type is PropulsionType.ELECTRIC:
                 power_on_source_kw = (
-                    performance_data_from_speed.power_source_data.electric_system.power_on_source_kw
+                    performance_data.power_source_data.electric_system.power_on_source_kw
                 )
             else:
                 raise NotImplementedError(
                     "The power source data is not implemented for the propulsion type: {self.machinery_system.propulsion_type}"
                 )
         elif self.machinery_system is None and self.propulsor is not None:
-            power_on_source_kw = (
-                performance_data_from_speed.propeller_data.shaft_power_kw
-            )
+            power_on_source_kw = performance_data.propeller_data.shaft_power_kw
         elif self.machinery_system is None and self.propulsor is None:
-            power_on_source_kw = (
-                performance_data_from_speed.hull_data.total_towing_power_kw
-            )
+            power_on_source_kw = performance_data.hull_data.total_towing_power_kw
         else:
-            power_on_source_kw = 0
+            power_on_source_kw = np.zeros([len(operation_point.speed_kn)])
 
-        if power_on_source_kw > operation_point.power_limit_kw:
-            performance_data_from_power = self.get_ship_performance_data_from_power(
-                power_out_source_kw=operation_point.power_limit_kw,
-                weather=operation_point.weather,
-                heading_deg=operation_point.heading_deg,
-                auxiliary_power_kw=operation_point.auxiliary_power,
-            )
-            return performance_data_from_power
-        else:
-            return performance_data_from_speed
+        greater_than_power_limit = np.greater(
+            power_on_source_kw, operation_point.power_limit_kw
+        )
+        for index, greater_than_power_limit_each in enumerate(greater_than_power_limit):
+            if greater_than_power_limit_each:
+                if operation_point.weather.significant_wave_height_m:
+                    significant_wave_height_m = (
+                        operation_point.weather.significant_wave_height_m[index]
+                    )
+                else:
+                    significant_wave_height_m = None
+                if operation_point.weather.mean_wave_period_s:
+                    mean_wave_period_s = operation_point.weather.mean_wave_period_s[
+                        index
+                    ]
+                else:
+                    mean_wave_period_s = (None,)
+                if operation_point.weather.wave_direction_deg:
+                    wave_direction_deg = operation_point.weather.wave_direction_deg[
+                        index
+                    ]
+                else:
+                    wave_direction_deg = None
+                if operation_point.weather.wind_speed_m_per_s:
+                    wind_speed_m_per_s = operation_point.weather.wind_speed_m_per_s[
+                        index
+                    ]
+                else:
+                    wind_speed_m_per_s = None
+                if operation_point.weather.wind_direction_deg:
+                    wind_direction_deg = operation_point.weather.wind_direction_deg[
+                        index
+                    ]
+                else:
+                    wind_direction_deg = None
+                if operation_point.weather.ocean_current_speed_m_per_s:
+                    ocean_current_speed_m_per_s = (
+                        operation_point.weather.ocean_current_speed_m_per_s[index]
+                    )
+                else:
+                    ocean_current_speed_m_per_s = None
+                if operation_point.weather.ocean_current_direction_deg:
+                    ocean_current_direction_deg = (
+                        operation_point.weather.ocean_current_direction_deg[index]
+                    )
+                else:
+                    ocean_current_direction_deg = None
+                weather = Weather(
+                    significant_wave_height_m=significant_wave_height_m,
+                    mean_wave_period_s=mean_wave_period_s,
+                    wave_direction_deg=wave_direction_deg,
+                    wind_speed_m_per_s=wind_speed_m_per_s,
+                    wind_direction_deg=wind_direction_deg,
+                    ocean_current_speed_m_per_s=ocean_current_speed_m_per_s,
+                    ocean_current_direction_deg=ocean_current_direction_deg,
+                )
+                if operation_point.power_limit_kw:
+                    power_limit_kw = operation_point.power_limit_kw[index]
+                else:
+                    power_limit_kw = 1e6
+                if operation_point.heading_deg:
+                    heading_deg = operation_point.heading_deg[index]
+                else:
+                    heading_deg = None
+                if operation_point.auxiliary_power:
+                    auxiliary_power_kw = operation_point.auxiliary_power[index]
+                else:
+                    auxiliary_power_kw = 0
+                performance_data_from_power = self.get_ship_performance_data_from_power(
+                    power_out_source_kw=power_limit_kw,
+                    weather=weather,
+                    heading_deg=heading_deg,
+                    auxiliary_power_kw=auxiliary_power_kw,
+                )
+
+                operation_point.speed_kn[index] = (
+                    performance_data_from_power.hull_data.vessel_speed_kn
+                )
+
+                performance_data = self.get_ship_performance_data_from_speed(
+                    vessel_speed_kn=operation_point.speed_kn,
+                    weather=operation_point.weather,
+                    heading_deg=operation_point.heading_deg,
+                    auxiliary_power_kw=operation_point.auxiliary_power,
+                )
+
+        return performance_data
