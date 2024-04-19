@@ -217,11 +217,11 @@ class OperationPoint:
 
     def __init__(
         self,
+        speed_kn: Numeric,
         timestamp_seconds: Numeric = None,
-        speed_kn: Numeric = None,
-        power_limit_kw: Numeric = None,
+        power_limit_kw: Numeric = 1e6,
         heading_deg: Numeric = None,
-        auxiliary_power: Numeric = None,
+        auxiliary_power: Numeric = 0,
         weather: Weather = None,
         location: Location = None,
     ):
