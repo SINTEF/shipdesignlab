@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v1.0.0...ship_model_lib-v1.0.1) (2024-04-19)
+
+
+### Bug Fixes
+
+* get_ship_performance_data_from_operating_point is now handling operation_point with arrays ([#19](https://github.com/SINTEF/shipdesignlab/issues/19)) ([49f2f92](https://github.com/SINTEF/shipdesignlab/commit/49f2f92320effb6beec5128b46cc0ea751aebcc2))
+
 ## [1.0.0](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v0.6.13...ship_model_lib-v1.0.0) (2024-04-17)
 
 
