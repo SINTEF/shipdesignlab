@@ -361,9 +361,11 @@ class ShipModel:
                 n_rps = np.zeros_like(vessel_speed_kn)
                 n_rps[vessel_speed_kn > 0] = 1
                 torque_newton_meter = np.zeros_like(vessel_speed_kn)
-                torque_newton_meter[shaft_power_kw > 0] = shaft_power_kw[
-                    shaft_power_kw > 0
-                ] / rps_to_rad_per_s(n_rps[shaft_power_kw > 0]) * 1000
+                torque_newton_meter[shaft_power_kw > 0] = (
+                    shaft_power_kw[shaft_power_kw > 0]
+                    / rps_to_rad_per_s(n_rps[shaft_power_kw > 0])
+                    * 1000
+                )
             propulsor_operating_point.n_rpm = n_rps * 60
             propulsor_operating_point.torque_newton_meter = torque_newton_meter
 
