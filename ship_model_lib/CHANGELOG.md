@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v1.0.2...ship_model_lib-v1.0.2) (2024-09-16)
+
+
+### Miscellaneous Chores
+
+* release 1.0.2 ([2cefcd1](https://github.com/SINTEF/shipdesignlab/commit/2cefcd1c0f4ac5abf6a7311dcf4335aa71051d0b))
+
 ## [1.0.2](https://github.com/SINTEF/shipdesignlab/compare/ship_model_lib-v1.0.1...ship_model_lib-v1.0.2) (2024-09016)
 
 ### Bug Fixes
