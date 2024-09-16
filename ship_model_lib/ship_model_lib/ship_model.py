@@ -353,7 +353,7 @@ class ShipModel:
             if np.isscalar(vessel_speed_kn):
                 n_rps = 1 if vessel_speed_kn > 0 else 0
                 torque_newton_meter = (
-                    shaft_power_kw / rps_to_rad_per_s(n_rps)
+                    shaft_power_kw / rps_to_rad_per_s(n_rps) * 1000
                     if shaft_power_kw > 0
                     else 0
                 )
@@ -363,7 +363,7 @@ class ShipModel:
                 torque_newton_meter = np.zeros_like(vessel_speed_kn)
                 torque_newton_meter[shaft_power_kw > 0] = shaft_power_kw[
                     shaft_power_kw > 0
-                ] / rps_to_rad_per_s(n_rps[shaft_power_kw > 0])
+                ] / rps_to_rad_per_s(n_rps[shaft_power_kw > 0]) * 1000
             propulsor_operating_point.n_rpm = n_rps * 60
             propulsor_operating_point.torque_newton_meter = torque_newton_meter
 
