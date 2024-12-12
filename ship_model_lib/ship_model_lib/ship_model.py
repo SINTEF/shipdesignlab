@@ -78,6 +78,8 @@ Numeric = TypeVar("Numeric", float, np.ndarray)
 class ShipDescription:
     name: str
     type: ShipType
+    imo_number: int = 0
+    mmsi: int = 0
 
 
 class HullOperatingPoint:
