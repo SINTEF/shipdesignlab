@@ -530,7 +530,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         """
         velocity = kn_to_m_per_s(velocity_kn)
         c_f = self._get_c_f(velocity)
-        dc_f = (110.31 * (150 * velocity / 0.514) ** 0.21 - 403.33) * c_f**2
+        dc_f = (110.31 * (150 * velocity) ** 0.21 - 403.33) * c_f**2
         fn = self._get_fn(velocity)
         c_r = self._get_c_r(fn)
         c_t = (1 + form_factor) * (c_f + dc_f) + c_r + self._c_a + self._c_aas
