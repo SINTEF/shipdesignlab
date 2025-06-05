@@ -533,7 +533,8 @@ class CalmWaterResistanceHollenbachBase(ABC):
         dc_f = (110.31 * (150 * velocity) ** 0.21 - 403.33) * c_f**2
         fn = self._get_fn(velocity)
         c_r = self._get_c_r(fn)
-        c_t = (1 + form_factor) * (c_f + dc_f) + c_r + self._c_a + self._c_aas
+        c_app = self._get_c_app(velocity)
+        c_t = (1 + form_factor) * (c_f + dc_f) + c_r + self._c_a + self._c_aas + c_app
         return self._ct_to_rt(c_t=c_t, velocity=velocity)
 
     def get_resistance_from_speed(
