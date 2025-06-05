@@ -502,9 +502,10 @@ class CalmWaterResistanceHollenbachBase(ABC):
         velocity = kn_to_m_per_s(velocity_kn)
         fn = self._get_fn(velocity)
         c_f = self._get_c_f(velocity)
+        dc_f = (110.31 * (150 * velocity) ** 0.21 - 403.33) * c_f**2
         c_r = self._get_c_r(fn)
         c_app = self._get_c_app(velocity)
-        c_t = c_f + c_r + self._c_a + self._c_aas + c_app
+        c_t = c_f + dc_f + c_r + self._c_a + self._c_aas + c_app
         return self._ct_to_rt(c_t=c_t, velocity=velocity)
 
     def _get_total_resistance_min(self, velocity_kn: Numeric) -> Numeric:
@@ -512,9 +513,10 @@ class CalmWaterResistanceHollenbachBase(ABC):
         velocity = kn_to_m_per_s(velocity_kn)
         fn = self._get_fn(velocity)
         c_f = self._get_c_f(velocity)
+        dc_f = (110.31 * (150 * velocity) ** 0.21 - 403.33) * c_f**2
         c_r = self._get_c_r_min(fn)
         c_app = self._get_c_app(velocity)
-        c_t = c_f + c_r + self._c_a + self._c_aas + c_app
+        c_t = c_f + dc_f + c_r + self._c_a + self._c_aas + c_app
         return self._ct_to_rt(c_t=c_t, velocity=velocity)
 
     def _get_total_resistance_max(self, velocity_kn: Numeric) -> Numeric:
