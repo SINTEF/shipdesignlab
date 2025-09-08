@@ -926,4 +926,69 @@ def test_PiersonMoskowitzSpectrumITTC1978 ():
     fig.show(renderer="svg")
 
 def test_added_resistance_reference_from_LangX_MaoW():
+    ship_dimension = ShipDimensionsAddedResistance(
+        b_beam_m=32.26,
+        lpp_length_between_perpendiculars_m=190,
+        cb_block_coefficient=0.6,
+        ta_draft_aft_m=9.5,
+        tf_draft_forward_m=9.5,
+        kyy_radius_gyration_in_lateral_direction_non_dim=0.26,
+    )
 
+    added_resistance_ref = dict(
+        wave_height_m=np.array([0.9, 1.7, 2.7, 3.4]),
+        added_resistance_n=np.array([19.4, 116.4, 261.0, 434.3]) * 1000,
+    )
+
+    added_resistance = AddedResistanceByStaWave2(
+        ship_dimension=ship_dimension,
+        wave_spectrum_type=WaveSpectrumType.JONSWAP_ITTC_1984,
+        gamma=3.3,
+    )
+    froude_number = 0.2
+    speed_m_per_s = froude_number * np.sqrt(
+        ship_dimension.lpp_length_between_perpendiculars_m * GRAVITY
+    )
+    r_aw_list = []
+    wave_length_list = []
+    speed_kn = m_per_s_to_kn(speed_m_per_s)
+    wave_height_array = np.linspace(0.1, 10, 100)
+    for wave_height in wave_height_array:
+        wave_period = 5 * np.sqrt(wave_height)
+        wave_length_list.append(wave_period ** 2 * GRAVITY / (2 * np.pi))
+        weather = Weather(
+            significant_wave_height_m=wave_height, mean_wave_period_s=wave_period
+        )
+        r_aw_list.append(
+            added_resistance.get_added_resistance_newton(
+                vessel_speed_kn=speed_kn, weather=weather
+            )[0]
+        )
+
+    r_aw_pm_list = []
+    added_resistance = AddedResistanceByStaWave2(ship_dimension=ship_dimension)
+    for wave_height in wave_height_array:
+        wave_period = 5 * np.sqrt(wave_height)
+        weather = Weather(
+            significant_wave_height_m=wave_height, mean_wave_period_s=wave_period
+        )
+        r_aw_pm_list.append(
+            added_resistance.get_added_resistance_newton(
+                vessel_speed_kn=speed_kn, weather=weather
+            )[0]
+        )
+
+    fig = make_subplots()
+    fig.add_trace(
+        go.Scatter(
+            x=added_resistance_ref["wave_height_m"],
+            y=added_resistance_ref["added_resistance_n"],
+            name="Measurement",
+        )
+    )
+    fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_list, name="JONSWAP"))
+    fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz"))
+    fig.show(renderer="svg")
+
+
+def
