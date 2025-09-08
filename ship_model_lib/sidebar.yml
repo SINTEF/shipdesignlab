@@ -7,3 +7,6 @@ website:
       - 02_Propulsor.ipynb
       - 03_Machinery.ipynb
       - 04_utility.ipynb
+      - 05_ship_model.ipynb
+      - 06_ship_dimensions.ipynb
+      - 07_operation_profile_structure.ipynb

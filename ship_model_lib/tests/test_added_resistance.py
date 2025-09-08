@@ -32,6 +32,18 @@ from ship_model_lib.utility import (
 )
 from plotly.subplots import make_subplots
 
+
+
+from ship_model_lib.added_resistance import (
+    PiersonMoskowitzSpectrumITTC1978,
+    JONSWAPSpectrumITTC1984,
+)
+from ship_model_lib.utility import m_per_s_to_kn
+from ship_model_lib.operation_profile_structure import Weather
+
+import plotly.graph_objects as go
+
+
 pd.options.plotting.backend = "plotly"
 
 
@@ -881,3 +893,37 @@ def test_added_resistance_ntnu_general_cargo_arbitrary_heading(
             )
     if show_plot:
         fig.show()
+
+
+def test_PiersonMoskowitzSpectrumITTC1978 ():
+    mean_wave_period_s = 11.44
+    significant_wave_height_m = 11
+
+    spectrum_pm = PiersonMoskowitzSpectrumITTC1978(
+        mean_wave_period_s=mean_wave_period_s,
+        significant_wave_height_m=significant_wave_height_m,
+    )
+    omega = np.linspace(0.01, 3, 300)
+    spectrum_density_pm = spectrum_pm.get_spectral_density_omega(omega_rad_per_s=omega)
+    fig = make_subplots()
+    fig.add_trace(go.Scatter(x=omega, y=spectrum_density_pm, name="Pierson-Moskowitz"))
+    fig.update_layout(title="Wave spectrum")
+    fig.update_xaxes(title="$\omega$")
+    fig.update_yaxes(title="$S(\omega)$")
+
+    for gamma in [1, 2.5, 7]:
+        spectrum_jonswap = JONSWAPSpectrumITTC1984(
+            significant_wave_height_m=significant_wave_height_m,
+            mean_wave_period_s=mean_wave_period_s,
+            gamma=gamma,
+        )
+        spectrum_density = spectrum_jonswap.get_spectral_density_omega(
+            omega_rad_per_s=omega
+        )
+        fig.add_trace(
+            go.Scatter(x=omega, y=spectrum_density, name=f"$JONSWAP-\gamma-{gamma}$")
+        )
+    fig.show(renderer="svg")
+
+def test_added_resistance_reference_from_LangX_MaoW():
+
