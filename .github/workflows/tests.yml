@@ -1,7 +1,6 @@
-name: Run nbdev_test on all projects
+name: Run tests and formatting checks
 
 on:
-  # Runs on pushes to any branch
   push:
     branches: ['*']
   pull_request:
@@ -10,11 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        project:
-          - ship_model_lib
 
     steps:
       - name: Checkout repository
@@ -37,12 +31,10 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run nbdev_test
+      - name: Run tests with pytest
         run: |
-          cd ${{ matrix.project }}
-          nbdev_test --do_print
-      
+          pytest
+
       - name: Check formatting by black
         run: |
-          cd ${{ matrix.project }}
           black --check .

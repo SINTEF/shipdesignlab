@@ -1,0 +1,23 @@
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+## HOllenbach Method
+"""Hollenbach’s model is an estimate of the power requirement of a ship, which focuses on the pre- diction of the resistance in calm water. The model is based on regression analysis of 433 ship models, and depends on the vessels main dimensions. The important details in the hull will therefore not have much of an effect in the resistance prediction. Hollenbach is the most recent empirical method for commercial vessels, and more accurate than other methods like Holtrop and Guldhammer-Harvald, as it uses a wider set of data and more complex formulas. The method separates the results in best and poor, with a difference of 5%. This gives the user the opportunity to decide whether the hull has good or poor hull lines.
+
+The total resistance is expresses as follows:
+
+$$R_{T} = \frac{1}{2}\rho V^2 S C_{T}$$
+
+where, $S$ is the wetted surface area, $\rho$ is density of the sea water, and $C_{T}$ is a friction coefficient. $C_{T}$ can be calculated as:
+
+$$C_{T} = C_{F} + C_{R}$$
+
+where the viscous friction coefficient $C_F$ can be calculated as follows:
+$$C_{F} = \frac{0.075}{\left(\log Re - 2\right)^2}$$
+$$Re = \frac{6 F_n \sqrt{6g}}{1.1395} \cdot 10^6$$
+
+The term for the residual friction coefficint $C_R$ is calculated
+$$C_{R, std} = b_{11} + b_{13} F_n + b_{13} F_n ^2 + C_B \left(b_{21} + b_{22}F_n + b_{23} F_n ^2 \right) + C_B ^2 \left(b_{31} + b_{32}F_n + b_{33} F_n ^2 \right)$$
+$$C_{R} = C_{R, std}C_{R, FnKrit} k_L \left(\frac{T}{B}\right)^{a_1} \left(\frac{B}{L}\right)^{a_2} \left(\frac{L_{OS}}{L_{WL}}\right)^{a_3} \left(\frac{L_{WL}}{L_{pp}}\right)^{a_4} \left(\frac{D_p}{T_A}\right)^{a_6}$$"""

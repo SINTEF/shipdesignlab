@@ -1,9 +1,0 @@
-project:
-  output-dir: _docs
-
-website:
-  title: "ship_model_lib"
-  site-url: "https://developer.github.io/ship_model_lib/"
-  description: "Model library for the hydrodynamics, energy system and fuel calculation"
-  repo-branch: main
-  repo-url: "https://github.com/developer/https://github.com/SINTEF/shipdesignlab/"

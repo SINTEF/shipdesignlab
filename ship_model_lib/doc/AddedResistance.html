@@ -1,0 +1,104 @@
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+### Added resistance
+
+Ref: ITTC - Recommended Procedures and Guidelines 7.5-04-01-01.2 Rev. 1 (2014)
+
+The empirical method has been developed by STA-JIP to approximate the transfer function of the mean resistance increase in heading regular waves by using the main parameters such as ship
+dimensions and speed. The method is applicable to the mean resistance increase in long crested irregular head waves $R_{AWL}$. The wave corrections are thus restricted to wave directions in the bow sector to $\pm 45$ degree off bow. Waves within the sector are corrected as head waves. Waves outside the $\pm 45$ sector are not corrected for.
+
+The method is valid for the following conditions:
+
+1. $75(m) \le L_{pp} \le 350(m)$
+2. $4.0 \le \frac{L_{pp}}{B} \le 9.0$
+3. $2.2 \le \frac{B}{T} \le 5.5$
+4. $0.10 \le Fr \le 0.30$
+5. $0.5 \le C_B \le 0.9$
+6. Wave direction within 0 to $\pm 45$ degree from bow.
+
+Where $L_{pp}$ is the length between perpendiculars, $B$ is the beam, $T$ is the draft, and $Fr$ is the Froude number.
+
+This empirical transfer function covers both the mean resistance increase due to wave reflection $R_{AWR}$ and the motion induced resistance $R_{AWM}$.
+
+$$R_{AWM} = 4 \rho g \zeta_A^2 \frac{B^2}{L_{pp}} \overline{raw}(\omega)$$
+$$\overline{raw}(\omega) = \overline{\omega}^{b_1} \exp\left\{\frac{b_1}{d_1} \left(1 - \overline{\omega}^d_1\right)\right\} a_1 Fr^{1.5} \exp(-3.5Fr)$$
+$$\overline{\omega} = \frac{\sqrt{\frac{L_{pp}}{g}} \sqrt[3]{k_{yy}}}{1.17Fr^{-0.143}} \omega$$
+$$a_1 = 60.3 C_B^{1.34}$$
+$$b1 = \left\{\begin{array}{ll}
+    11.0 & \mbox{for $\overline{\omega} \le 1$} \\
+    -8.50 & \mbox{elsewhere}
+\end{array}\right.$$
+$$d_1 = \left\{\begin{array}{ll}
+    14.0 & \mbox{for $\overline{\omega} \le 1} \\
+    -566 \left(\frac{L_{pp}}{B}\right)^{-2.66} & \mbox{elsewhere}
+\end{array}\right.$$
+
+and
+
+$$R_{AWR} = \frac{1}{2} \rho g \zeta_A^2 B \alpha_1(\omega)$$
+$$\alpha_1(\omega) = \frac{\pi^2 I_1^2 \left(1.5kT_m\right)}{\pi^2 I_1^2 \left(1.5kT_m\right) + K_1^2\left(1.5kT_m\right)}f_1$$
+$$f_1 = 0.692 \frac{V_s}{\sqrt{T_m g}}^{0.769} + 1.81{C_B}^{6.95}$$
+
+where:
+
+$C_B$:block coefficient,
+
+$k_{yy}$: non-dimensional radius of gyration in lateral direction,
+
+$L_{pp}$: ship length between perpendiculars,
+
+$T_m$: Draught at midship,
+
+$I_1$: modified Bessel function of the first kind of order 1,
+
+$K_1$: modified Bessel function of the second kind of order 1,
+
+Finally,
+
+$$R_{AWL} = 2 \int_0^\infty \frac{R_{AWR} + R_{AWM}}{\zeta_A^2}S_f(\omega) d\omega$$
+
+
+### Wave spectrum
+Ref: The Specialist Committee on Waves: Final Report and Recommendations to the 23rd ITTC, Proceedings of the 23rd ITTC – Volume II, 2003
+Ref: ITTC – Recommended Procedures and Guidelines: Seakeeping Experiments 7.5-02 07-02.12014
+Ref: SEA STATE PARAMETERS AND ENGINEERING WAVE SPECTRA, https://folk.ntnu.no/oivarn/hercules_ntnu/LWTcourse/partB/3seastate/3%20SEA%20STATE%20PARAMETERS%20AND%20ENGINEERING%20WAVE%20SPECTRA.htm
+
+Ref: Lee, U.-J.; Jeong, W.-M.; Cho, H.-Y. Estimation and Analysis of JONSWAP Spectrum Parameter Using Observed Data around Korean Coast. J. Mar. Sci. Eng. 2022, 10, 578. https://doi.org/10.3390/jmse10050578
+Ref: Goda, Y. Random Seas and Design of Maritime Structures; World Scientific Publishing Company: Singapore, 2010; Volume 33.
+
+From the recommendation of ITTC for wave parameters, the spectral enegy density proposed by Pierson and Moskowitz is expressed as
+$$S(\omega) = \frac{A}{\omega^5}\exp\left(-\frac{B}{\omega^4}\right)$$
+In the original work by Pierson and Moskowitz both A and B were related to the wind speed 19.5 m above the mean sea surface, but today A and B are in some way related to the main sea state parameters. Recommendation from ITTC in 1978 gives
+$$A = 173\frac{h_s^2}{T_1^4}$$
+$$B = \frac{691}{T_1^4}$$
+where, $T_1$ is mean wave period and $h_s$ is significant wave height.
+
+For JONSWAP spectrum, the following formulation and parameters are recommended in 1984,
+$$S(\omega) = \frac{A}{\omega^5} \exp\left(-\frac{B}{\omega^4}\right)
+\gamma^p$$
+
+where,
+$$A = 155\frac{h_s^2}{T_1^4}$$
+$$B = \frac{944}{T_1^4}$$
+$$p = \exp\left[-\frac{\left(0.191 \omega T_1 - 1\right)^2}{2 \sigma_0^2}\right]$$
+
+The default value for $\gamma$ is 3.3 for North Sea. It can be used as a control parameter for the shape of the spectrum.
+
+From the work by Lee et al.(2022), the JONSWAP spectrum is expressed as,
+
+$$S(f) = \frac{\alpha g^2}{\left(2\pi\right)^4} f^{-5} \exp\left[-1.25 \left(T_p f \right)^{-4}\right] \gamma{p}$$
+$$p = \exp\left[-\frac{\left(T_p f - 1\right)^2}{2 \sigma^2}\right]$$
+$$\sigma \approx \left\{\begin{array}
+    0.07, & f \leq f_p \\
+    0.09, & f \gt f_p
+\end{array}\right.$$
+
+where the Philips parameter $\alpha = 0.0081$. This spectrum can be expressed in terms of $h_s$ and $f_p$ according to work by Goda,
+
+$$S(f)=B h_s^2 T_p^{−4} f^{−5} \exp\left[−1.25 \left(T_p f \right)^{−4}\right] \gamma^{p∗} $$
+$$B = \frac{0.0624(1.094 - 0.01915 \log \gamma)}{0.230 + 0.0336 \gamma − 0.185\left(1.9 + \gamma\right)^{−1}}$$
+$$T_p = \frac{T_{1/3}}{1 − 0.132\left(\gamma + 0.2\right)^{−0.559}}$$
+
+where $\gamma = 3.3$ for North Sea.

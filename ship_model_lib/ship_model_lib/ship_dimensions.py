@@ -3,6 +3,21 @@
 # %% auto 0
 __all__ = ['ShipDimensionsHollenbachSingleScrew', 'ShipDimensionsHollenbachTwinScrew', 'ShipDimensionsAddedResistance']
 
+
+# The idea behind the current ship dimensions is to allow for combining different pre-defined
+# ship dimension data classes that will satisfy all resistance classes in use. Each ship
+# dimension data class is designed to fit one resistance model class, or other classes
+# needing ship dimensions. By creating a new ship dimension class specific for a project and
+# inheriting from the pre-defined ship dimension classes, the resulting class will ensure
+# that all required fields are filled, and there is no need to fill in the same data twice.
+# If additional models are implemented requiring ship dimensions, the naming convention
+# should follow the ship dimension classes defined here, and accept an inherited ship
+# dimension class as input.
+
+
+
+
+
 # %% ../06_ship_dimensions.ipynb 1
 from dataclasses import dataclass
 
