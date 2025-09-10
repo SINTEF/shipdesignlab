@@ -31,6 +31,9 @@ from ship_model_lib.utility import (
     kn_to_m_per_s,
 )
 from plotly.subplots import make_subplots
+from scipy.special import gamma
+from scipy.integrate import quad
+
 
 
 
@@ -990,5 +993,101 @@ def test_added_resistance_reference_from_LangX_MaoW():
     fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz"))
     fig.show(renderer="svg")
 
+    weather.wave_direction_deg = np.array([180])
+    heading = weather.wave_direction_deg - (45 + random.random() * 100)
+    assert weather.wave_direction_deg - heading > 45
+    assert (
+            added_resistance.get_added_resistance_newton(
+                vessel_speed_kn=16, weather=weather, heading_deg=heading
+            )
+            == 0
+    ), "The addded resistance should be 0."
 
-def
+
+def test_weather_array():
+    # Test array input
+    vessel_speed = np.array([15] * 100)
+    significant_wave_height_m_list = []
+    mean_wave_period_s_list = []
+    wave_height_array = np.linspace(0.1, 10, 100)
+    for wave_height in wave_height_array:
+        significant_wave_height_m_list.append(wave_height)
+        mean_wave_period_s_list.append(5 * np.sqrt(wave_height))
+
+    weather_array = Weather(
+        significant_wave_height_m=np.array(significant_wave_height_m_list),
+        mean_wave_period_s=np.array(mean_wave_period_s_list),
+    )
+
+
+def test_angular_distribution_function():
+    def _get_angular_component_in_angle(
+            wave_angle_rad: float, encounter_angle_rad: float, is_swell: bool = False
+    ) -> float:
+        """Calculate angular distribution for a given encounter angle and spreading parameter.
+
+        Reference: ITTC. (2021). Recommended Procedures and Guidelines: Preparation,
+        Conduct and Analysis of Speed/Power Trials.
+
+        @param encounter_angle_rad: Encounter angle in degrees
+        @param is_swell: If True, use spreading parameter for swells (0.75),
+        otherwise use spreading parameter for wind waves (1.0
+        @return: Angular distribution
+        """
+        spreading_parameter = 0.75 if is_swell else 1.0
+        gamma1 = gamma(1 + 2 * spreading_parameter)
+        gamma2 = gamma(1 + spreading_parameter)
+        angle_between = (wave_angle_rad - encounter_angle_rad) % (2 * np.pi)
+        angle_between = (
+            angle_between - 2 * np.pi if angle_between > np.pi else angle_between
+        )
+        angle_between = np.abs(angle_between)
+        if angle_between > np.pi / 2:
+            return 0.0
+        return (
+                np.power(2, 2 * spreading_parameter)
+                * np.power(gamma2, 2)
+                / (np.pi * gamma1)
+                * np.power(np.cos(angle_between), 2 * spreading_parameter)
+        )
+
+    # Testing angular distribution function
+    angle_array = np.linspace(0, 2 * np.pi, 361)
+    fig = make_subplots()
+    fig_cart = make_subplots()
+    integrated_value = []
+    for index in range(5):
+        encounter_angle = np.pi / 4 * index
+        angular_distribution = np.array(
+            [
+                _get_angular_component_in_angle(
+                    angle, encounter_angle_rad=encounter_angle, is_swell=False
+                )
+                for angle in angle_array
+            ]
+        )
+        fig.add_scatterpolar(
+            r=angular_distribution,
+            theta=angle_array * 180 / np.pi,
+            name=f"Encounter angle: {encounter_angle * 180 / np.pi}",
+        )
+        fig_cart.add_scatter(
+            x=angle_array * 180 / np.pi,
+            y=angular_distribution,
+            name=f"Encounter angle: {encounter_angle * 180 / np.pi}",
+        )
+        integrated_value.append(
+            quad(
+                func=_get_angular_component_in_angle,
+                a=0,
+                b=2 * np.pi,
+                args=(encounter_angle, False),
+            )[0]
+        )
+    fig.show()
+    fig_cart.show()
+    fig = make_subplots()
+    fig.add_scatter(
+        x=np.linspace(0, np.pi, 5), y=np.array(integrated_value), name="Integrated value"
+    )
+    fig.show()
