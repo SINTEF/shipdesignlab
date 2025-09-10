@@ -1,6 +1,7 @@
 import pytest
 import random
 import numpy as np
+import os
 
 from ship_model_lib.propulsor import PropulsorDataScalar, PropulsorDataBseries
 from ship_model_lib.ship_model import HullOperatingPoint
@@ -79,8 +80,6 @@ def test_propulsor_data_scalar():
 
 def test_get_propulsor_data_open_water_from_vessel_speed_rps():
 
-    # Test data:
-
     vessel_speed_kn = np.array([13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18])
     wake_fraction = np.array(
         [0.338, 0.337, 0.336, 0.335, 0.334, 0.332, 0.329, 0.328, 0.326, 0.325, 0.322]
@@ -124,9 +123,10 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         pitch_diameter_ratio=1.2,
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
     )
-    propulsor.plot_open_water_curves()
+  #  if not os.getenv("CI"):  # Skip plotting on CI or in test context
+   #     propulsor.plot_open_water_curves()
 
-    # Test get_propulsor_data_from_vessel_speed_rps
+
     j_value = (
             random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
     )
@@ -211,7 +211,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
         re_correction=ReCorrection.ITTC78,
     )
-    propulsor_bseries.plot_open_water_curves()
+    #propulsor_bseries.plot_open_water_curves()
 
     propulsor = PropulsorDataOpenWater(
         propeller_curve_points=propeller_curve_points,
@@ -219,7 +219,9 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         pitch_diameter_ratio=1.2,
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
     )
-    propulsor.plot_open_water_curves()
+    #if not os.getenv("CI"):  # Skip plotting on CI or in test context
+     #   propulsor.plot_open_water_curves()
+
 
 
 
