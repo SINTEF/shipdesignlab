@@ -9,11 +9,11 @@ numpy~=1.26.0
 pandas~=2.2.0
 plotly~=5.13.0
 protobuf~=4.21.12
-pytest~=7.2.1
+pytest~=8.2.1
 scipy~=1.12.0
 tqdm
 twine~=4.0.2
 typing_extensions~=4.11.0
 types-protobuf~=4.21.0.3
-black[jupyter]~=24.2.0
+black[jupyter]~=24.3.0
 operation_profile_lib==0.1.12
