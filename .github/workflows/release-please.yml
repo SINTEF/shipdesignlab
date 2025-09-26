@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-python@v4
         if: ${{ steps.release.outputs.releases_created }}
         with:
-          python-version: "3.12"
+          python-version: "3.11"
       - name: Install pypa/build
         if: ${{ steps.release.outputs.releases_created }}
         run: >-
