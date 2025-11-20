@@ -50,9 +50,9 @@ from ship_model_lib.machinery import (
     LoadInput,
     PropulsionType,
 )
-from .types import ShipType
+from .ship_types import ShipType
 
-# %% ../05_ship_model.ipynb 3
+
 Numeric = TypeVar("Numeric", float, np.ndarray)
 
 
