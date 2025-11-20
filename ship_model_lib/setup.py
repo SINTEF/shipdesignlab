@@ -54,6 +54,10 @@ dev_requirements = (cfg.get("dev_requirements") or "").split()
 
 setuptools.setup(
     name=cfg["lib_name"],
+    version=cfg["version"],
+    description=cfg["description"],
+    author=cfg["author"],
+    author_email=cfg["author_email"],
     license=lic[0],
     classifiers=[
         "Development Status :: " + statuses[int(cfg["status"])],
@@ -62,23 +66,19 @@ setuptools.setup(
     ]
     + [
         "Programming Language :: Python :: " + o
-        for o in py_versions[py_versions.index(min_python) :]
+        for o in py_versions[py_versions.index(min_python):]
     ]
     + (["License :: " + lic[1]] if lic[1] else []),
     url=cfg["git_url"],
-    packages=setuptools.find_packages() + ["."],
+    packages=setuptools.find_packages(),
     include_package_data=True,
-    package_data={"dependencies": ["*.npy"]},
     install_requires=requirements,
     extras_require={"dev": dev_requirements},
-    dependency_links=cfg.get("dep_links", "").split(),
     python_requires=">=" + cfg["min_python"],
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     zip_safe=False,
     entry_points={
         "console_scripts": cfg.get("console_scripts", "").split(),
-        "nbdev": [f'{cfg.get("lib_path")}={cfg.get("lib_path")}._modidx:d'],
     },
-    **setup_cfg,
 )
