@@ -57,6 +57,25 @@ from dataclasses import dataclass
 Numeric = TypeVar("Numeric", float, np.ndarray)
 
 
+from ship_model_lib.ship_model import ShipPerformanceData, ShipDescription, HullOperatingPoint
+from ship_model_lib.machinery import MachinerySystemResult
+from ship_model_lib.propulsor import PropulsorOperatingPoint
+
+
+
+class ShipModel:
+    def __init__(
+        self,
+        description: ShipDescription,
+        hull_data: ShipPerformanceData.hull_data,
+        propulsor_data: ShipPerformanceData.propeller_data,
+        machinery_system: MachinerySystem,
+    ):
+        self.description = description
+        self.hull_data = hull_data
+        self.propulsor_data = propulsor_data
+        self.machinery_system = machinery_system
+
 
 
 @dataclass
