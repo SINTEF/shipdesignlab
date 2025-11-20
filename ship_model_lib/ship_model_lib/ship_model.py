@@ -57,9 +57,81 @@ from dataclasses import dataclass
 Numeric = TypeVar("Numeric", float, np.ndarray)
 
 
-from ship_model_lib.ship_model import ShipPerformanceData, ShipDescription, HullOperatingPoint
-from ship_model_lib.machinery import MachinerySystemResult
-from ship_model_lib.propulsor import PropulsorOperatingPoint
+
+@dataclass
+class ShipDescription:
+    name: str
+    type: ShipType
+
+
+class HullOperatingPoint:
+    def __init__(
+        self,
+        vessel_speed_kn: float,
+        calm_water_resistance_newton: float,
+        added_resistance_wave_newton: float,
+        added_resistance_wind_newton: float,
+    ):
+        self.vessel_speed_kn = vessel_speed_kn
+        self.calm_water_resistance_newton = calm_water_resistance_newton
+        self.added_resistance_wave_newton = added_resistance_wave_newton
+        self.added_resistance_wind_newton = added_resistance_wind_newton
+
+    def __repr__(self):
+        kws = [f"{key}={value!r}" for key, value in self.__dict__.items()]
+        return "{}({})".format(type(self).__name__, ", ".join(kws))
+
+    @property
+    def total_resistance_newton(self):
+        return (
+            self.calm_water_resistance_newton
+            + self.added_resistance_wave_newton
+            + self.added_resistance_wind_newton
+        )
+
+    @property
+    def total_towing_power_kw(self):
+        vessel_speed_m_per_s = kn_to_m_per_s(self.vessel_speed_kn)
+        return self.total_resistance_newton * vessel_speed_m_per_s / 1000
+
+
+
+@dataclass
+class HullData:
+    b_beam_m: float
+    lpp_length_between_perpendiculars_m: float
+    los_length_over_surface_m: float
+    lwl_length_water_line_m: float
+    cb_block_coefficient: float
+    ta_draft_aft_m: float
+    tf_draft_forward_m: float
+    wetted_surface_m2: float
+    av_transverse_area_above_water_line_m2: float
+    area_bilge_keel_m2: float
+
+
+@dataclass
+class PropulsorData:
+    dp_diameter_propeller_m: float
+    pd_pitch_diameter_ratio: float
+    ear_blade_area_ratio: float
+    z_blade_number: int
+
+
+@dataclass
+class ShipPerformanceData:
+    ship_description: ShipDescription
+    propeller_data: PropulsorOperatingPoint
+    hull_data: HullOperatingPoint
+    power_source_data: MachinerySystemResult
+
+
+@dataclass
+class ShipPerformanceData:
+    ship_description: ShipDescription
+    propeller_data: PropulsorOperatingPoint
+    hull_data: HullOperatingPoint
+    power_source_data: MachinerySystemResult
 
 
 
