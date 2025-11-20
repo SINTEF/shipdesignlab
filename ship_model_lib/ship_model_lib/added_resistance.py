@@ -12,7 +12,7 @@ from scipy.special import jv, yv
 from scipy.integrate import quad, dblquad, simpson
 from scipy.special import gamma
 
-from .types import WaveSpectrumType, ShipType
+from .ship_types import WaveSpectrumType, ShipType
 from ship_model_lib.utility import (
     get_interpolation_1d_function,
     Interpolated1DValue,

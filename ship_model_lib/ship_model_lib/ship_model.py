@@ -50,7 +50,7 @@ from ship_model_lib.machinery import (
     LoadInput,
     PropulsionType,
 )
-from .types import ShipType
+from .ship_types import ShipType
 from dataclasses import dataclass
 
 

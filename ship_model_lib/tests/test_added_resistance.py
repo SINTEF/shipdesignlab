@@ -24,7 +24,7 @@ from ship_model_lib.propulsor import (
     PropulsorDataOpenWater,
     WakeFractionThrustDeductionFactorPoint,
 )
-from ship_model_lib.types import ShipType
+from ship_model_lib.ship_types import ShipType
 from ship_model_lib.utility import (
     m_per_s_to_kn,
     get_speed_kn_from_froude_number,
