@@ -11,28 +11,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # 2. Set up Python 3.12
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - uses: actions/cache@v4
+      # 3. Cache pip dependencies
+      - name: Cache pip
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - run: pip install -r requirements.txt
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
+      # 5. Run tests with pytest
       - name: Run tests with pytest
         run: |
           pip install pytest
           pytest --maxfail=1 --disable-warnings -v
         env:
+          # Important: PYTHONPATH points to inner ship_model_lib folder
           PYTHONPATH: ${{ github.workspace }}/ship_model_lib
 
+      # 6. Check code formatting with black
       - name: Check formatting by black
         run: |
           pip install black
