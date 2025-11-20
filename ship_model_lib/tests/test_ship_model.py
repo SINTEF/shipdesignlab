@@ -149,33 +149,35 @@ def propulsor_b_series() -> PropulsorDataBseries:
     )
 
 
-# def test_ship_model_get_performance_data_from_speed_and_vice_versa(
-#     calm_water_resistance, machinery_system
-# ):
-#     """Test ShipModel.get_performance_data_from_speed and ShipMode.get_performance_from_power."""
-#     # Test with the electric propulsion system
-#     design_speed_kn = 20
-#
-#
-#     ship_model = ShipModel(
-#         calm_water_resistance=calm_water_resistance,
-#         propulsor=PropulsorDataScalar(efficiency=0.7),
-#         machinery_system=machinery_system,
-#     )
-#     speed_array_kn = np.linspace(1, design_speed_kn, 21)
-#     verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
-#
-#     # Test with the mechanical propulsion system
-#     machinery_system_mechanical_propulsion = get_machinery_system_nodel(
-#         propulsion_type=PropulsionType.MECHANICAL,
-#         efficiency_propulsion_drive=0.85,
-#         efficiency_power_source=0.45,
-#         efficiency_auxiliary_load=1.0,
-#         rated_power_source_kw=10000,
-#         rated_power_auxiliary_kw=1000,
-#     )
-#     ship_model.machinery_system = machinery_system_mechanical_propulsion
-#     verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
+def test_ship_model_get_performance_data_from_speed_and_vice_versa(
+    calm_water_resistance, machinery_system
+):
+    """Test ShipModel.get_performance_data_from_speed and ShipMode.get_performance_from_power."""
+    # Test with the electric propulsion system
+    design_speed_kn = 20
+
+
+
+
+    ship_model = ShipModel(
+        calm_water_resistance=calm_water_resistance,
+        propulsor=PropulsorDataScalar(efficiency=0.7),
+        machinery_system=machinery_system,
+    )
+    speed_array_kn = np.linspace(1, design_speed_kn, 21)
+    verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
+
+    # Test with the mechanical propulsion system
+    machinery_system_mechanical_propulsion = get_machinery_system_nodel(
+        propulsion_type=PropulsionType.MECHANICAL,
+        efficiency_propulsion_drive=0.85,
+        efficiency_power_source=0.45,
+        efficiency_auxiliary_load=1.0,
+        rated_power_source_kw=10000,
+        rated_power_auxiliary_kw=1000,
+    )
+    ship_model.machinery_system = machinery_system_mechanical_propulsion
+    verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
 
 
 @pytest.fixture
