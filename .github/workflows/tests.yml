@@ -40,8 +40,8 @@ jobs:
           pip install pytest
           pytest --maxfail=1 --disable-warnings -v
         env:
-          # Important: PYTHONPATH points to inner ship_model_lib folder
-          PYTHONPATH: ${{ github.workspace }}/ship_model_lib
+          PYTHONPATH: ${{ github.workspace }}/ship_model_lib/ship_model_lib
+
 
       # 6. Check code formatting with black
       - name: Check formatting by black
