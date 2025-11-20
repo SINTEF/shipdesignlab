@@ -136,13 +136,11 @@ class ShipPerformanceData:
 
 
 class ShipModel:
-    def __init__(
-        self,
-        description: ShipDescription,
-        hull_data: ShipPerformanceData.hull_data,
-        propulsor_data: ShipPerformanceData.propeller_data,
-        machinery_system: MachinerySystem,
-    ):
+    def __init__(self,
+                 description: ShipDescription,
+                 hull_data: HullData,
+                 propulsor_data: PropulsorData,
+                 machinery_system: MachinerySystem):
         self.description = description
         self.hull_data = hull_data
         self.propulsor_data = propulsor_data
