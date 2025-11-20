@@ -52,7 +52,6 @@ from ship_model_lib.machinery import (
 )
 from .types import ShipType
 from dataclasses import dataclass
-from ship_model_lib.types import ShipDescription, PropulsorOperatingPoint, HullOperatingPoint, MachinerySystemResult
 
 
 Numeric = TypeVar("Numeric", float, np.ndarray)
