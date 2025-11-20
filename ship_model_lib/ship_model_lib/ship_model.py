@@ -125,7 +125,6 @@ class ShipPerformanceData:
     power_source_data: MachinerySystemResult
 
 
-# %% ../05_ship_model.ipynb 5
 CalmWaterModel = Union[
     CalmWaterResistanceHollenbachTwinScrewDesignDraft,
     CalmWaterResistanceHollenbachSingleScrewBallastDraft,

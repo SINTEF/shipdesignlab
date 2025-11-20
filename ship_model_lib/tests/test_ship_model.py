@@ -158,31 +158,17 @@ def test_ship_model_get_performance_data_from_speed_and_vice_versa(
     # Test with the electric propulsion system
     design_speed_kn = 20
 
-    hull_data = HullData(
-        b_beam_m=24,
-        lpp_length_between_perpendiculars_m=145,
-        los_length_over_surface_m=150,
-        lwl_length_water_line_m=146.7,
-        cb_block_coefficient=0.75,
-        ta_draft_aft_m=8.2,
-        tf_draft_forward_m=8.2,
-        wetted_surface_m2=4400,
-        av_transverse_area_above_water_line_m2=2,
-        area_bilge_keel_m2=1,
-        # optional: include calm_water_resistance if HullData supports it
-        # calm_water_resistance=calm_water_resistance
-    )
-
-    # Create PropulsorData
-    propulsor_data = PropulsorDataScalar(efficiency=0.7)
-
-    # Initialize ShipModel
     ship_model = ShipModel(
-        description=ShipDescription(name="Test ship", type=ShipType.ro_pax),
-        hull_data=hull_data,
-        propulsor_data=propulsor_data,
+        ship_description=ShipDescription(name="Test ship", type=ShipType.ro_pax),
+        calm_water_resistance=calm_water_resistance,
+        propulsor=PropulsorDataScalar(efficiency=0.7),
         machinery_system=machinery_system,
     )
+
+    speed_array_kn = np.linspace(1, design_speed_kn, 21)
+
+    # Call your verification function
+    verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
 
     speed_array_kn = np.linspace(1, 20, 21)
 
