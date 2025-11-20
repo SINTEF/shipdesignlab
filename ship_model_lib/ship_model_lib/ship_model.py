@@ -56,22 +56,22 @@ Numeric = TypeVar("Numeric", float, np.ndarray)
 
 
 class ShipModel:
-    """A container class representing the full ship model."""
+    description: "ShipDescription"
+    hull_data: "HullData"
+    propulsor_data: "PropulsorData"
 
     def __init__(
         self,
-        description: ShipDescription,
-        hull_data: HullData,
-        propulsor_data: PropulsorData,
-        machinery_system: MachinerySystem,
+        description: "ShipDescription",
+        hull_data: "HullData",
+        propulsor_data: "PropulsorData",
+        machinery_system: "MachinerySystem",
     ):
         self.description = description
         self.hull_data = hull_data
         self.propulsor_data = propulsor_data
         self.machinery_system = machinery_system
 
-    def __repr__(self):
-        return f"ShipModel({self.description})"
 
 
 
