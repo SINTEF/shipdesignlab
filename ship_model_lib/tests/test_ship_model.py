@@ -53,6 +53,26 @@ from ship_model_lib.ship_model import (
     CalmWaterResistanceHollenbachSingleScrewBallastDraft,
 )
 
+from ship_model_lib.ship_model import ShipModel
+from ship_model_lib.types import ShipDescription, HullData, PropulsorData
+
+
+
+def make_ship_model(calm_water_resistance, propulsor_efficiency, machinery_system):
+    description = ShipDescription(name="Test Ship")
+    hull_data = HullData(calm_water_resistance=calm_water_resistance)
+    propulsor_data = PropulsorData(efficiency=propulsor_efficiency)
+    return ShipModel(
+        description=description,
+        hull_data=hull_data,
+        propulsor_data=propulsor_data,
+        machinery_system=machinery_system,
+    )
+
+
+
+
+
 def verify_ship_model_performance(
     ship_model: ShipModel, speed_array_kn: np.ndarray = None
 ):
@@ -149,11 +169,13 @@ def test_ship_model_get_performance_data_from_speed_and_vice_versa(
     """Test ShipModel.get_performance_data_from_speed and ShipMode.get_performance_from_power."""
     # Test with the electric propulsion system
     design_speed_kn = 20
-    ship_model = ShipModel(
-        calm_water_resistance=calm_water_resistance,
-        propulsor=PropulsorDataScalar(efficiency=0.7),
-        machinery_system=machinery_system,
-    )
+
+    ship_model = make_ship_model(calm_water_resistance, 0.7, machinery_system)
+    # ship_model = ShipModel(
+    #     calm_water_resistance=calm_water_resistance,
+    #     propulsor=PropulsorDataScalar(efficiency=0.7),
+    #     machinery_system=machinery_system,
+    # )
     speed_array_kn = np.linspace(1, design_speed_kn, 21)
     verify_ship_model_performance(ship_model=ship_model, speed_array_kn=speed_array_kn)
 
