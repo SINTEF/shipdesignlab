@@ -1,8 +1,8 @@
-
 from ship_model_lib.utility import get_interpolation_1d_function
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import numpy as np
+
 
 def test_interpolation_1d_function():
 
@@ -18,7 +18,9 @@ def test_interpolation_1d_function():
     ), "The function should not be zero when origin was not added."
     assert interp_function_with_out_origo(
         0
-    ).is_extrapolated, "The value is extrapolated, while the object says that it is not."
+    ).is_extrapolated, (
+        "The value is extrapolated, while the object says that it is not."
+    )
 
     x_new = np.linspace(0, 5, 51)
     y_new = interp_function_with_out_origo(x_new).value
@@ -39,9 +41,13 @@ def test_interpolation_1d_function():
     ), "The function should be zero when origin was added."
     assert interp_function_with_origo(
         0
-    ).is_extrapolated, "The value is extrapolated, while the object says that it is not."
+    ).is_extrapolated, (
+        "The value is extrapolated, while the object says that it is not."
+    )
 
     x_new = np.linspace(0, 5, 51)
     y_new = interp_function_with_origo(x_new).value
-    fig.add_trace(go.Scatter(x=x_new, y=y_new, name="Interpolation with adding the origin"))
+    fig.add_trace(
+        go.Scatter(x=x_new, y=y_new, name="Interpolation with adding the origin")
+    )
     fig.show(renderer="png")

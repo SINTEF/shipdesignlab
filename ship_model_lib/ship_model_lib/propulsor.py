@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
@@ -96,6 +95,7 @@ def m_per_s_to_kn(m_per_s: Numeric) -> Numeric:
 
 def rps_to_rad_per_s(n_rps: Numeric) -> Numeric:
     return n_rps * 2 * np.pi
+
 
 class PropulsorDataOpenWater(Propulsor):
     """Propulsor defined by open water propeller data

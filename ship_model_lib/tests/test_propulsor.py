@@ -78,6 +78,7 @@ def test_propulsor_data_scalar():
         hull_operating_point.total_towing_power_kw / efficiency,
     )
 
+
 def test_get_propulsor_data_open_water_from_vessel_speed_rps():
 
     vessel_speed_kn = np.array([13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18])
@@ -98,18 +99,48 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         )
     ]
 
-    j_array = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])
+    j_array = np.array(
+        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
+    )
     kt_array = (
-            np.array(
-                [5.97, 5.54, 5.08, 4.58, 4.07, 3.57, 3.08, 2.57, 2.07, 1.58, 1.08, 0.53, 0.0]
-            )
-            * 1e-1
+        np.array(
+            [
+                5.97,
+                5.54,
+                5.08,
+                4.58,
+                4.07,
+                3.57,
+                3.08,
+                2.57,
+                2.07,
+                1.58,
+                1.08,
+                0.53,
+                0.0,
+            ]
+        )
+        * 1e-1
     )
     kq_array = (
-            np.array(
-                [8.86, 8.26, 7.72, 7.09, 6.49, 5.90, 5.31, 4.66, 4.00, 3.32, 2.62, 1.83, 0.87]
-            )
-            * 1e-2
+        np.array(
+            [
+                8.86,
+                8.26,
+                7.72,
+                7.09,
+                6.49,
+                5.90,
+                5.31,
+                4.66,
+                4.00,
+                3.32,
+                2.62,
+                1.83,
+                0.87,
+            ]
+        )
+        * 1e-2
     )
 
     propeller_curve_points = [
@@ -123,12 +154,11 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         pitch_diameter_ratio=1.2,
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
     )
-  #  if not os.getenv("CI"):  # Skip plotting on CI or in test context
-   #     propulsor.plot_open_water_curves()
-
+    #  if not os.getenv("CI"):  # Skip plotting on CI or in test context
+    #     propulsor.plot_open_water_curves()
 
     j_value = (
-            random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
+        random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
     )
     speed_kn = random.random() * 20
     n_rps = kn_to_m_per_s(speed_kn) / (j_value * propulsor._d)
@@ -136,15 +166,17 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         vessel_speed_kn=speed_kn, n_rps=n_rps
     )
     eff_hull = (propulsion_point.resistance_newton * speed_kn) / (
-            propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
+        propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
     )
     eff_open_water = (
-                             propulsion_point.propeller_thrust_newton
-                             * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
-                     ) / (propulsion_point.shaft_power_kw * 1000)
+        propulsion_point.propeller_thrust_newton
+        * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
+    ) / (propulsion_point.shaft_power_kw * 1000)
     print(propulsion_point)
     assert propulsion_point.efficiency_hull == pytest.approx(eff_hull, rel=1e-4)
-    assert propulsion_point.efficiency_open_water == pytest.approx(eff_open_water, rel=1e-4)
+    assert propulsion_point.efficiency_open_water == pytest.approx(
+        eff_open_water, rel=1e-4
+    )
 
     # Test the inverse
     propulsion_point_inv = propulsor.get_propulsor_data_from_vessel_speed_thrust(
@@ -155,6 +187,7 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         assert getattr(propulsion_point_inv, field.name)[0] == pytest.approx(
             getattr(propulsion_point, field.name), rel=1e-4
         )
+
 
 def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
 
@@ -171,18 +204,48 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         [0.201, 0.205, 0.209, 0.214, 0.218, 0.22, 0.223, 0.224, 0.227, 0.229, 0.233]
     )
 
-    j_array = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])
+    j_array = np.array(
+        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
+    )
     kt_array = (
-            np.array(
-                [5.97, 5.54, 5.08, 4.58, 4.07, 3.57, 3.08, 2.57, 2.07, 1.58, 1.08, 0.53, 0.0]
-            )
-            * 1e-1
+        np.array(
+            [
+                5.97,
+                5.54,
+                5.08,
+                4.58,
+                4.07,
+                3.57,
+                3.08,
+                2.57,
+                2.07,
+                1.58,
+                1.08,
+                0.53,
+                0.0,
+            ]
+        )
+        * 1e-1
     )
     kq_array = (
-            np.array(
-                [8.86, 8.26, 7.72, 7.09, 6.49, 5.90, 5.31, 4.66, 4.00, 3.32, 2.62, 1.83, 0.87]
-            )
-            * 1e-2
+        np.array(
+            [
+                8.86,
+                8.26,
+                7.72,
+                7.09,
+                6.49,
+                5.90,
+                5.31,
+                4.66,
+                4.00,
+                3.32,
+                2.62,
+                1.83,
+                0.87,
+            ]
+        )
+        * 1e-2
     )
 
     propeller_curve_points = [
@@ -211,7 +274,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
         re_correction=ReCorrection.ITTC78,
     )
-    #propulsor_bseries.plot_open_water_curves()
+    # propulsor_bseries.plot_open_water_curves()
 
     propulsor = PropulsorDataOpenWater(
         propeller_curve_points=propeller_curve_points,
@@ -219,14 +282,11 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         pitch_diameter_ratio=1.2,
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
     )
-    #if not os.getenv("CI"):  # Skip plotting on CI or in test context
-     #   propulsor.plot_open_water_curves()
-
-
-
+    # if not os.getenv("CI"):  # Skip plotting on CI or in test context
+    #   propulsor.plot_open_water_curves()
 
     j_value = (
-            random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
+        random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
     )
     speed_kn = random.random() * 20
     n_rps = kn_to_m_per_s(speed_kn) / (j_value * propulsor._d)
@@ -234,15 +294,17 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         vessel_speed_kn=speed_kn, n_rps=n_rps
     )
     eff_hull = (propulsion_point.resistance_newton * speed_kn) / (
-            propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
+        propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
     )
     eff_open_water = (
-                             propulsion_point.propeller_thrust_newton
-                             * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
-                     ) / (propulsion_point.shaft_power_kw * 1000)
+        propulsion_point.propeller_thrust_newton
+        * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
+    ) / (propulsion_point.shaft_power_kw * 1000)
     print(propulsion_point)
     assert propulsion_point.efficiency_hull == pytest.approx(eff_hull, rel=1e-4)
-    assert propulsion_point.efficiency_open_water == pytest.approx(eff_open_water, rel=1e-4)
+    assert propulsion_point.efficiency_open_water == pytest.approx(
+        eff_open_water, rel=1e-4
+    )
 
     # Test the inverse
     propulsion_point_inv = propulsor.get_propulsor_data_from_vessel_speed_thrust(
@@ -273,56 +335,56 @@ def test_input_data_are_the_same_length():
     data_set_propeller_diameter_pd_m = 7
     data_set_j = np.array([x / 20 for x in range(0, 19)])
     data_set_kt = (
-            np.array(
-                [
-                    4.109,
-                    3.905,
-                    3.699,
-                    3.491,
-                    3.279,
-                    3.064,
-                    2.847,
-                    2.629,
-                    2.412,
-                    2.194,
-                    1.977,
-                    1.758,
-                    1.536,
-                    1.311,
-                    1.078,
-                    0.838,
-                    0.587,
-                    0.33,
-                    0.068,
-                ]
-            )
-            * 1e-1
+        np.array(
+            [
+                4.109,
+                3.905,
+                3.699,
+                3.491,
+                3.279,
+                3.064,
+                2.847,
+                2.629,
+                2.412,
+                2.194,
+                1.977,
+                1.758,
+                1.536,
+                1.311,
+                1.078,
+                0.838,
+                0.587,
+                0.33,
+                0.068,
+            ]
+        )
+        * 1e-1
     )
     data_set_kq = (
-            np.array(
-                [
-                    4.828,
-                    4.607,
-                    4.387,
-                    4.168,
-                    3.949,
-                    3.729,
-                    3.509,
-                    3.29,
-                    3.071,
-                    2.851,
-                    2.629,
-                    2.403,
-                    2.17,
-                    1.926,
-                    1.668,
-                    1.394,
-                    1.103,
-                    0.797,
-                    0.0484,
-                ]
-            )
-            * 1e-2
+        np.array(
+            [
+                4.828,
+                4.607,
+                4.387,
+                4.168,
+                3.949,
+                3.729,
+                3.509,
+                3.29,
+                3.071,
+                2.851,
+                2.629,
+                2.403,
+                2.17,
+                1.926,
+                1.668,
+                1.394,
+                1.103,
+                0.797,
+                0.0484,
+            ]
+        )
+        * 1e-2
     )
     # | hide
     data_set_n_rpm = [74.1, 77, 79.9, 82.7, 85.6, 88.5, 91.6, 94.7, 98.2, 101.9, 106.3]

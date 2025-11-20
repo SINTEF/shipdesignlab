@@ -68,7 +68,7 @@ setuptools.setup(
     ]
     + [
         "Programming Language :: Python :: " + o
-        for o in py_versions[py_versions.index(min_python):]
+        for o in py_versions[py_versions.index(min_python) :]
     ]
     + (["License :: " + lic[1]] if lic[1] else []),
     url=cfg["git_url"],

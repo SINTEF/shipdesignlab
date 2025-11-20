@@ -269,7 +269,9 @@ def test_emission_factor():
     )(power_load_ratio)
     emissions_ref = emission_factor_interpolated * power_kw / 1000
     emission_factor = EmissionFactor(
-        factor=emission_curve, emission_type=EmissionType.NOX, rated_power_kw=rated_power_kw
+        factor=emission_curve,
+        emission_type=EmissionType.NOX,
+        rated_power_kw=rated_power_kw,
     )
     emission_factor.get_emission_plot().show(renderer="svg")
     emission_calculated = emission_factor.get_emission_kg_per_h(power_kw)
@@ -328,7 +330,8 @@ def test_emissions():
     ), "Power not added correctly"
     assert np.isclose(
         machinery_result_total.fuel_consumption.total_fuel_consumption,
-        fuel_consumption1.total_fuel_consumption + fuel_consumption2.total_fuel_consumption,
+        fuel_consumption1.total_fuel_consumption
+        + fuel_consumption2.total_fuel_consumption,
     ), "Fuel consumption not added correctly"
     for key in EmissionType:
         emission_name = key.value
@@ -336,7 +339,6 @@ def test_emissions():
             getattr(machinery_result_total.emissions, emission_name),
             getattr(emissions1, emission_name) + getattr(emissions2, emission_name),
         ), f"{emission_name} emissions not added correctly"
-
 
 
 def test_power_sources_with_scalar_efficiency():
@@ -376,7 +378,9 @@ def test_power_sources_with_scalar_efficiency():
     # Test fuel consumption with array input
     power_load_array = np.random.random(100) * rated_power_kw
     assert np.allclose(
-        power_source.get_fuel_consumption_kg_per_h(power_load_array).total_fuel_consumption,
+        power_source.get_fuel_consumption_kg_per_h(
+            power_load_array
+        ).total_fuel_consumption,
         specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000,
     ), "Fuel consumption should be equal to reference value."
     # Test emissions with scalar input
@@ -404,14 +408,14 @@ def test_power_sources_with_scalar_efficiency():
         ]
     )
     specific_fuel_consumption_ref_g_per_kwh = (
-            1
-            / interp1d(
-        x=efficiency_curve.to_x_array(),
-        y=efficiency_curve.to_y_array(),
-        kind="cubic",
-    )(power_load_array / rated_power_kw)
-            / fuel.lhv_mj_per_kg
-            * 3600
+        1
+        / interp1d(
+            x=efficiency_curve.to_x_array(),
+            y=efficiency_curve.to_y_array(),
+            kind="cubic",
+        )(power_load_array / rated_power_kw)
+        / fuel.lhv_mj_per_kg
+        * 3600
     )
     power_source = PowerSourceWithEfficiency(
         fuel=fuel,
@@ -432,7 +436,9 @@ def test_power_sources_with_scalar_efficiency():
     fuel_consumption_calculated = power_source.get_fuel_consumption_kg_per_h(
         power_load_array
     ).total_fuel_consumption
-    fuel_consumption_ref = specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    fuel_consumption_ref = (
+        specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    )
     assert np.allclose(fuel_consumption_calculated, fuel_consumption_ref)
     # Test emiisions
     emission_calculated = power_source.get_emissions_kg_per_h(power_load_array)
@@ -475,7 +481,7 @@ def test_power_sources_with_scalar_specific_fuel_consumption():
         power_load_scalar
     ).total_fuel_consumption
     fuel_consumption_ref = (
-            specific_fuel_consumption_ref_g_per_kwh * power_load_scalar / 1000
+        specific_fuel_consumption_ref_g_per_kwh * power_load_scalar / 1000
     )
     assert np.isclose(
         fuel_consumption_calculated, fuel_consumption_ref
@@ -485,7 +491,9 @@ def test_power_sources_with_scalar_specific_fuel_consumption():
     fuel_consumption_calculated = power_source.get_fuel_consumption_kg_per_h(
         power_load_array
     ).total_fuel_consumption
-    fuel_consumption_ref = specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    fuel_consumption_ref = (
+        specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    )
     assert np.allclose(
         fuel_consumption_calculated, fuel_consumption_ref
     ), "Fuel consumption should be equal to reference value."
@@ -525,7 +533,9 @@ def test_power_sources_with_scalar_specific_fuel_consumption():
     fuel_consumption_calculated = power_source.get_fuel_consumption_kg_per_h(
         power_load_array
     ).total_fuel_consumption
-    fuel_consumption_ref = specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    fuel_consumption_ref = (
+        specific_fuel_consumption_ref_g_per_kwh * power_load_array / 1000
+    )
     assert np.allclose(fuel_consumption_calculated, fuel_consumption_ref)
     # Test machinery result
     machinery_result = power_source.get_machinery_result(power_load_array)
@@ -535,7 +545,7 @@ def test_power_sources_with_scalar_specific_fuel_consumption():
     )
 
 
-def test_machinery_system ():
+def test_machinery_system():
     # | hide
     rated_power_kw = 1000 * random.random()
     efficiency = random.random()
@@ -579,7 +589,9 @@ def test_machinery_system ():
         machinery_result.fuel_consumption.total_fuel_consumption,
     )
     for key in emissions.__dict__:
-        assert np.isclose(emissions.__dict__[key], machinery_result.emissions.__dict__[key])
+        assert np.isclose(
+            emissions.__dict__[key], machinery_result.emissions.__dict__[key]
+        )
 
     # | hide
     # Test Machinery system
@@ -590,7 +602,9 @@ def test_machinery_system ():
     rated_power_for_mechanical_system = 1000 * random.random()
     specific_fuel_consumption_ref_g_per_kwh = 180
     shaft_efficiency = 0.99
-    electric_power_output = electric_system.power_source.rated_power_kw * random.random()
+    electric_power_output = (
+        electric_system.power_source.rated_power_kw * random.random()
+    )
     mechanical_power_output_kw = rated_power_for_mechanical_system * random.random()
     mechanical_load_input = LoadInput
     power_source_for_mechanical_system = PowerSourceWithSpecificFuelConsumption(
@@ -645,7 +659,8 @@ def test_machinery_system ():
         result_electric_system.fuel_consumption.total_fuel_consumption,
     )
     assert np.allclose(
-        result.electric_system.power_on_source_kw, result_electric_system.power_on_source_kw
+        result.electric_system.power_on_source_kw,
+        result_electric_system.power_on_source_kw,
     )
     for key in EmissionType:
         assert np.isclose(

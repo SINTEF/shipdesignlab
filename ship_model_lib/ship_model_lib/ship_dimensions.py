@@ -11,6 +11,7 @@
 
 from dataclasses import dataclass
 
+
 @dataclass(kw_only=True)
 class ShipDimensionsHollenbachSingleScrew:
     """Ship dimensions for Hollenbach single screw ship model."""

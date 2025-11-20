@@ -395,6 +395,7 @@ class AddedResistanceByStaWave2(AddedResistance):
         if cb < 0.5 or cb > 0.9:
             logger.warning("Cb is out of range. It should be between 0.5 and 0.9.")
 
+
 @dataclass
 class AddedResistanceBySNNM(AddedResistance):
     ship_type: ShipType = None

@@ -21,23 +21,31 @@ def test_calm_water_resistance_by_speed_resistance_curve():
     power_kw = np.power(speed_kn, 3) * 5
 
     fig = make_subplots()
-    fig.add_trace(go.Scatter(x=speed_kn, y=power_kw, mode="markers", name="Points given"))
+    fig.add_trace(
+        go.Scatter(x=speed_kn, y=power_kw, mode="markers", name="Points given")
+    )
 
     resistance_model = CalmWaterResistanceBySpeedPowerCurve(
         speed_ref_kn=speed_kn, power_ref_kw=power_kw
     )
     speed_new = np.linspace(0, speed_kn.max(), 100)
     power_estimated = resistance_model.get_power_from_speed(speed_kn=speed_new)
-    fig.add_trace(go.Scatter(x=speed_new, y=power_estimated.value, name="Power Estimated"))
+    fig.add_trace(
+        go.Scatter(x=speed_new, y=power_estimated.value, name="Power Estimated")
+    )
     power_new = np.linspace(0, power_kw.max(), 100)
     speed_estimated = resistance_model.get_speed_from_power(power_kw=power_new)
-    fig.add_trace(go.Scatter(x=speed_estimated.value, y=power_new, name="Speed Estimated"))
+    fig.add_trace(
+        go.Scatter(x=speed_estimated.value, y=power_new, name="Speed Estimated")
+    )
     fig.update_layout(title="Speed vs Power")
     fig.show(renderer="svg")
 
-
     file_path = os.path.join(
-        os.path.dirname(__file__), "..", "test_data", "hollenbach_design_draft_resistance.csv"
+        os.path.dirname(__file__),
+        "..",
+        "test_data",
+        "hollenbach_design_draft_resistance.csv",
     )
     file_path = os.path.abspath(file_path)
     df = pd.read_csv(file_path)
@@ -55,9 +63,13 @@ def test_calm_water_resistance_by_speed_resistance_curve():
         speed_ref_kn=speed_kn, resistance_ref_k_n=resistance_k_n
     )
     speed_new = np.linspace(0, speed_kn.max(), 100)
-    resistance_estimated = resistance_model.get_resistance_from_speed(velocity_kn=speed_new)
+    resistance_estimated = resistance_model.get_resistance_from_speed(
+        velocity_kn=speed_new
+    )
     fig.add_trace(
-        go.Scatter(x=speed_new, y=resistance_estimated.value, name="Resistance Estimated")
+        go.Scatter(
+            x=speed_new, y=resistance_estimated.value, name="Resistance Estimated"
+        )
     )
     resistance_new = np.linspace(0, resistance_k_n.max(), 100)
     speed_estimated = resistance_model.get_speed_from_resistance(
@@ -129,7 +141,9 @@ def test_the_code_for_Hollenbach_method():
     df_to_plot = pd.DataFrame(index=speed_kn)
     df_to_plot["resistance_min"] = resistance_force_k_n_minimum
     df_to_plot["resistance_mean"] = resistance_force_k_n_mean
-    df_to_plot["resistance_mean_form_factor"] = resistance_force_k_n_mean_with_form_factor
+    df_to_plot["resistance_mean_form_factor"] = (
+        resistance_force_k_n_mean_with_form_factor
+    )
     df_to_plot["resistance_max"] = resistance_force_k_n_maximum
     fig: Figure = df_to_plot.plot()
     fig.update_xaxes(title="Speed [kn]")
@@ -151,15 +165,14 @@ def test_the_code_for_Hollenbach_method():
         speed_kn_ref, speed_kn_estimated
     ), f"The estimated speed - {speed_kn_estimated} - is not equal to the answer - {speed_kn_ref}."
 
-
-
-
     file_path = os.path.join(
-        os.path.dirname(__file__), "..", "test_data", "hollenbach_design_draft_coeff_ref.csv"
+        os.path.dirname(__file__),
+        "..",
+        "test_data",
+        "hollenbach_design_draft_coeff_ref.csv",
     )
     file_path = os.path.abspath(file_path)
     df_output_ref = pd.read_csv(file_path)
-
 
     assert np.isclose(ship_model._lfn_length_froude_number, 149.0)
     assert np.isclose(ship_model._k_l, 0.9778, rtol=1e-4)
@@ -197,16 +210,14 @@ def test_the_code_for_Hollenbach_method():
     assert np.isclose(ship_model._c_a, 0.06e-3)
     assert np.isclose(ship_model._c_aas, 0.08248e-3, rtol=1e-4)
 
-
-
     file_path = os.path.join(
-        os.path.dirname(__file__), "..", "test_data", "hollenbach_design_draft_coeff_all.csv"
+        os.path.dirname(__file__),
+        "..",
+        "test_data",
+        "hollenbach_design_draft_coeff_all.csv",
     )
     file_path = os.path.abspath(file_path)
     df_output_coeff_ref = pd.read_csv(file_path)
-
-
-
 
     df_output_coeff = pd.DataFrame()
     df_output_coeff["vs"] = df_output_ref.vs.values
@@ -219,20 +230,22 @@ def test_the_code_for_Hollenbach_method():
     df_output_coeff["c_f"] = ship_model._get_c_f(kn_to_m_per_s(df_output.vs.values))
     df_output_coeff["c_app"] = ship_model._get_c_app(kn_to_m_per_s(df_output.vs.values))
     df_output_coeff["c_t_min"] = (
-            df_output_coeff.c_r_min
-            + df_output_coeff.c_f
-            + df_output_coeff.c_app
-            + ship_model._c_aas
-            + ship_model._c_a
+        df_output_coeff.c_r_min
+        + df_output_coeff.c_f
+        + df_output_coeff.c_app
+        + ship_model._c_aas
+        + ship_model._c_a
     )
     df_output_coeff["c_t"] = (
-            df_output_coeff.c_r
-            + df_output_coeff.c_f
-            + df_output_coeff.c_app
-            + ship_model._c_aas
-            + ship_model._c_a
+        df_output_coeff.c_r
+        + df_output_coeff.c_f
+        + df_output_coeff.c_app
+        + ship_model._c_aas
+        + ship_model._c_a
     )
-    df_output_coeff["c_t_max"] = df_output_coeff.c_t * ship_model._factor_for_max_resistance
+    df_output_coeff["c_t_max"] = (
+        df_output_coeff.c_t * ship_model._factor_for_max_resistance
+    )
     overwrite_df_output_coeff = False
     if overwrite_df_output_coeff:
         df_output_coeff.to_csv(path_to_ref_data)
@@ -244,11 +257,13 @@ def test_the_code_for_Hollenbach_method():
         )
 
     file_path = os.path.join(
-        os.path.dirname(__file__), "..", "test_data", "hollenbach_design_draft_resistance.csv"
+        os.path.dirname(__file__),
+        "..",
+        "test_data",
+        "hollenbach_design_draft_resistance.csv",
     )
     file_path = os.path.abspath(file_path)
     df_output_resistance_ref = pd.read_csv(file_path)
-
 
     df_output_resistance = pd.DataFrame()
     df_output_resistance["vs"] = df_output_ref.vs.values
@@ -259,7 +274,9 @@ def test_the_code_for_Hollenbach_method():
     df_output_resistance["r_t_min"] = ship_model._get_total_resistance_min(
         df_output.vs.values
     )
-    df_output_resistance["r_t"] = ship_model._get_total_resistance_mean(df_output.vs.values)
+    df_output_resistance["r_t"] = ship_model._get_total_resistance_mean(
+        df_output.vs.values
+    )
     df_output_resistance["r_t_max"] = ship_model._get_total_resistance_max(
         df_output.vs.values
     )
@@ -273,7 +290,9 @@ def test_the_code_for_Hollenbach_method():
                 df_output_resistance[col_name].values,
             )
         )
-    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show(renderer="svg")
+    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show(
+        renderer="svg"
+    )
 
     ship_dimensions_twin_screw = ShipDimensionsHollenbachTwinScrew(
         b_beam_m=b_beam,

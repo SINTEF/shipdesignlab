@@ -35,8 +35,6 @@ from scipy.special import gamma
 from scipy.integrate import quad
 
 
-
-
 from ship_model_lib.added_resistance import (
     PiersonMoskowitzSpectrumITTC1978,
     JONSWAPSpectrumITTC1984,
@@ -898,7 +896,7 @@ def test_added_resistance_ntnu_general_cargo_arbitrary_heading(
         fig.show()
 
 
-def test_PiersonMoskowitzSpectrumITTC1978 ():
+def test_PiersonMoskowitzSpectrumITTC1978():
     mean_wave_period_s = 11.44
     significant_wave_height_m = 11
 
@@ -927,6 +925,7 @@ def test_PiersonMoskowitzSpectrumITTC1978 ():
             go.Scatter(x=omega, y=spectrum_density, name=f"$JONSWAP-\gamma-{gamma}$")
         )
     fig.show(renderer="svg")
+
 
 def test_added_resistance_reference_from_LangX_MaoW():
     ship_dimension = ShipDimensionsAddedResistance(
@@ -958,7 +957,7 @@ def test_added_resistance_reference_from_LangX_MaoW():
     wave_height_array = np.linspace(0.1, 10, 100)
     for wave_height in wave_height_array:
         wave_period = 5 * np.sqrt(wave_height)
-        wave_length_list.append(wave_period ** 2 * GRAVITY / (2 * np.pi))
+        wave_length_list.append(wave_period**2 * GRAVITY / (2 * np.pi))
         weather = Weather(
             significant_wave_height_m=wave_height, mean_wave_period_s=wave_period
         )
@@ -990,17 +989,19 @@ def test_added_resistance_reference_from_LangX_MaoW():
         )
     )
     fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_list, name="JONSWAP"))
-    fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz"))
+    fig.add_trace(
+        go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz")
+    )
     fig.show(renderer="svg")
 
     weather.wave_direction_deg = np.array([180])
     heading = weather.wave_direction_deg - (45 + random.random() * 100)
     assert weather.wave_direction_deg - heading > 45
     assert (
-            added_resistance.get_added_resistance_newton(
-                vessel_speed_kn=16, weather=weather, heading_deg=heading
-            )
-            == 0
+        added_resistance.get_added_resistance_newton(
+            vessel_speed_kn=16, weather=weather, heading_deg=heading
+        )
+        == 0
     ), "The addded resistance should be 0."
 
 
@@ -1022,7 +1023,7 @@ def test_weather_array():
 
 def test_angular_distribution_function():
     def _get_angular_component_in_angle(
-            wave_angle_rad: float, encounter_angle_rad: float, is_swell: bool = False
+        wave_angle_rad: float, encounter_angle_rad: float, is_swell: bool = False
     ) -> float:
         """Calculate angular distribution for a given encounter angle and spreading parameter.
 
@@ -1045,10 +1046,10 @@ def test_angular_distribution_function():
         if angle_between > np.pi / 2:
             return 0.0
         return (
-                np.power(2, 2 * spreading_parameter)
-                * np.power(gamma2, 2)
-                / (np.pi * gamma1)
-                * np.power(np.cos(angle_between), 2 * spreading_parameter)
+            np.power(2, 2 * spreading_parameter)
+            * np.power(gamma2, 2)
+            / (np.pi * gamma1)
+            * np.power(np.cos(angle_between), 2 * spreading_parameter)
         )
 
     # Testing angular distribution function
@@ -1088,6 +1089,8 @@ def test_angular_distribution_function():
     fig_cart.show()
     fig = make_subplots()
     fig.add_scatter(
-        x=np.linspace(0, np.pi, 5), y=np.array(integrated_value), name="Integrated value"
+        x=np.linspace(0, np.pi, 5),
+        y=np.array(integrated_value),
+        name="Integrated value",
     )
     fig.show()

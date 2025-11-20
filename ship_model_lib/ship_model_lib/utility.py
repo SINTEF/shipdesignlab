@@ -9,7 +9,6 @@ import numpy as np
 Numeric = Union[float, np.ndarray]
 
 
-
 def kn_to_m_per_s(v_kn: Numeric) -> Numeric:
     return v_kn * 0.5144
 

@@ -5,6 +5,7 @@ from ship_model_lib.operation_profile_structure import Weather, OperationPoint, 
 
 Numeric = Union[float, np.ndarray]
 
+
 def test_operation_profile_structure():
 
     data = dict(

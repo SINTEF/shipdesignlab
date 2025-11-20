@@ -3,11 +3,12 @@ from ship_model_lib.calm_water_resistance import (
 )
 
 from ship_model_lib.ship_dimensions import (
-ShipDimensionsHollenbachSingleScrew,
-ShipDimensionsAddedResistance,
+    ShipDimensionsHollenbachSingleScrew,
+    ShipDimensionsAddedResistance,
 )
 
 from dataclasses import dataclass
+
 
 def test_ship_dimension_test():
     # | hide
@@ -52,6 +53,3 @@ def test_ship_dimension_test():
         )
     )
     calm_water_hollenbach_single_screw.get_resistance_from_speed(velocity_kn=10)
-
-
-

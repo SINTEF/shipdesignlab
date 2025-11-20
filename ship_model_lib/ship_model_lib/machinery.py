@@ -266,6 +266,7 @@ class MachinerySystemResult(NamedTuple):
     mechanical_system: Optional[MachineryResult] = None
     electric_system: Optional[MachineryResult] = None
 
+
 @dataclass(kw_only=True)
 class PowerSource(ABC):
     fuel: FuelByMassFraction
