@@ -38,7 +38,7 @@ class CalmWaterResistanceBase(ABC):
     def _speed_to_y_interpolation_function(
         self, kind: Union[str, int] = "cubic"
     ) -> Callable[[Numeric], Interpolated1DValue]:
-        """Returns a interpolation function for propulsion speed in waves in respect to a given
+        """Returns a interpolation function for  propulsion speed in waves in respect to a given
         power
 
         Arguments:
