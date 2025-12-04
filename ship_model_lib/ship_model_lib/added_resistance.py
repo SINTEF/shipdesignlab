@@ -22,7 +22,7 @@ from .ship_dimensions import ShipDimensionsAddedResistance
 import numpy as np
 
 
-Numeric = TypeVar("Numeric", float, np.ndarray)
+Numeric = TypeVar("Numeric ", float, np.ndarray)
 
 # Define logger
 logger = logging.getLogger(__name__)
