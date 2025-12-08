@@ -6,7 +6,7 @@ import numpy as np
 from plotly.subplots import make_subplots
 from plotly.graph_objs import Figure as PlotlyFigure
 from .utility import get_interpolation_1d_function, Interpolated1DValue
-from .ship_types import PropulsionType, EmissionType
+from .types import PropulsionType, EmissionType
 
 Numeric = TypeVar("Numeric", np.ndarray, float)
 

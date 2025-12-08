@@ -3,7 +3,7 @@ import pandas as pd
 from pandas.errors import EmptyDataError
 from scipy import interpolate
 
-from ship_model_lib.ship_types import ShipType
+from ship_model_lib.types import ShipType
 
 ship_type = ShipType.bulk_capesize
 is_laden = True

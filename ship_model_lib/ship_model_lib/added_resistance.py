@@ -12,7 +12,7 @@ from scipy.special import jv, yv
 from scipy.integrate import quad, dblquad, simpson
 from scipy.special import gamma
 
-from .ship_types import WaveSpectrumType, ShipType
+from .types import WaveSpectrumType, ShipType
 from ship_model_lib.utility import (
     get_interpolation_1d_function,
     Interpolated1DValue,
@@ -988,7 +988,7 @@ class AddedResistanceBySNNM(AddedResistance):
         array_to_integrate_in_wave_direction = np.array(
             [
                 simpson(
-                    self._get_function_to_integrate(
+                    y=self._get_function_to_integrate(
                         omega_rad_per_s=omega_array,
                         wave_direction_rad=wave_direction,
                         vessel_speed_kn=vessel_speed_kn,
@@ -996,14 +996,14 @@ class AddedResistanceBySNNM(AddedResistance):
                         mean_wave_period_s=mean_wave_period_s,
                         encounter_angle_rad=encounter_angle_rad,
                     ),
-                    omega_array,
+                    x=omega_array,
                 )
                 for wave_direction in wave_direction_array
             ]
         )
         return (
             2
-            * simpson(array_to_integrate_in_wave_direction, wave_direction_array)
+            * simpson(y=array_to_integrate_in_wave_direction, x=wave_direction_array)
             * RHO
             * GRAVITY
             * np.power(b, 2)
