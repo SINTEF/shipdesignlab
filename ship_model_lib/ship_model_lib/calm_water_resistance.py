@@ -7,7 +7,7 @@ import logging
 
 import numpy as np
 from .utility import get_interpolation_1d_function, Interpolated1DValue
-from .types import ResistanceLevel
+from .ship_types import ResistanceLevel
 
 # Define logger
 logger = logging.getLogger(__name__)
