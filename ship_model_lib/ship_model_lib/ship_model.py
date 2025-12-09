@@ -480,43 +480,43 @@ class ShipModel:
                 greater_than_power_limit
             ):
                 if greater_than_power_limit_each:
-                    if operation_point.weather.significant_wave_height_m:
+                    if operation_point.weather.significant_wave_height_m is not None:
                         significant_wave_height_m = (
                             operation_point.weather.significant_wave_height_m[index]
                         )
                     else:
                         significant_wave_height_m = None
-                    if operation_point.weather.mean_wave_period_s:
+                    if operation_point.weather.mean_wave_period_s is not None:
                         mean_wave_period_s = operation_point.weather.mean_wave_period_s[
                             index
                         ]
                     else:
                         mean_wave_period_s = (None,)
-                    if operation_point.weather.wave_direction_deg:
+                    if operation_point.weather.wave_direction_deg is not None:
                         wave_direction_deg = operation_point.weather.wave_direction_deg[
                             index
                         ]
                     else:
                         wave_direction_deg = None
-                    if operation_point.weather.wind_speed_m_per_s:
+                    if operation_point.weather.wind_speed_m_per_s is not None:
                         wind_speed_m_per_s = operation_point.weather.wind_speed_m_per_s[
                             index
                         ]
                     else:
                         wind_speed_m_per_s = None
-                    if operation_point.weather.wind_direction_deg:
+                    if operation_point.weather.wind_direction_deg is not None:
                         wind_direction_deg = operation_point.weather.wind_direction_deg[
                             index
                         ]
                     else:
                         wind_direction_deg = None
-                    if operation_point.weather.ocean_current_speed_m_per_s:
+                    if operation_point.weather.ocean_current_speed_m_per_s is not None:
                         ocean_current_speed_m_per_s = (
                             operation_point.weather.ocean_current_speed_m_per_s[index]
                         )
                     else:
                         ocean_current_speed_m_per_s = None
-                    if operation_point.weather.ocean_current_direction_deg:
+                    if operation_point.weather.ocean_current_direction_deg is not None:
                         ocean_current_direction_deg = (
                             operation_point.weather.ocean_current_direction_deg[index]
                         )
@@ -535,11 +535,11 @@ class ShipModel:
                         power_limit_kw = operation_point.power_limit_kw[index]
                     else:
                         power_limit_kw = 1e6
-                    if operation_point.heading_deg:
+                    if operation_point.heading_deg is not None:
                         heading_deg = operation_point.heading_deg[index]
                     else:
                         heading_deg = None
-                    if operation_point.auxiliary_power:
+                    if operation_point.auxiliary_power is not None:
                         auxiliary_power_kw = operation_point.auxiliary_power[index]
                     else:
                         auxiliary_power_kw = 0
