@@ -194,7 +194,7 @@ class EmissionFactor:
 
     @property
     def has_scalar_factor(self) -> bool:
-        return isinstance(self.factor, float)
+        return isinstance(self.factor, Union[float, int])
 
     @cached_property
     def interpolate_factor(self) -> Callable[[Numeric], Interpolated1DValue]:
