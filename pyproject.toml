@@ -1,0 +1,119 @@
+[project]
+name = "shipdesignlab"
+version = "1.0.2"
+description = "Ship Design Lab - Comprehensive ship performance modeling and analysis"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "SINTEF Ocean", email = "kevinkoosup.yum@gmail.com" }]
+
+dependencies = ["ship-model-lib"]
+
+[project.optional-dependencies]
+dev = ["ship-model-lib[dev]", "ruff>=0.8.0"]
+
+examples = [
+  "jupyter~=1.0.0",
+  "jupyterlab~=4.1.0",
+  "matplotlib~=3.8.2",
+  "plotly~=5.13.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/SINTEF/shipdesignlab"
+Documentation = "https://sintef.github.io/shipdesignlab/"
+Repository = "https://github.com/SINTEF/shipdesignlab"
+Issues = "https://github.com/SINTEF/shipdesignlab/issues"
+
+# UV workspace configuration
+[tool.uv.workspace]
+members = ["ship_model_lib"]
+
+[tool.uv.sources]
+ship-model-lib = { workspace = true }
+
+# Development dependencies (new uv format)
+[dependency-groups]
+dev = ["ruff>=0.8.0", "pytest>=7.2.1"]
+
+# Ruff configuration for the entire workspace
+[tool.ruff]
+line-length = 100
+indent-width = 4
+target-version = "py312"
+
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+  "*.ipynb",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "N",   # pep8-naming
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "SIM", # flake8-simplify
+  "RUF", # Ruff-specific rules
+]
+
+ignore = [
+  "E501",   # line too long (handled by formatter)
+  "E402",   # module import not at top of file
+  "E731",   # lambda assignment
+  "E741",   # ambiguous variable name
+  "B008",   # do not perform function calls in argument defaults
+  "B904",   # raise from None or explicit exception
+  "B905",   # zip without explicit strict parameter
+  "SIM108", # use ternary operator (sometimes less readable)
+  "SIM113", # use enumerate instead of manual counter
+  "N802",   # function name should be lowercase
+  "N803",   # argument name should be lowercase
+  "N806",   # variable in function should be lowercase
+  "UP007",  # Use X | Y for type annotations
+  "UP046",  # Use PEP 695 type parameter syntax (Python 3.12+)
+  "UP047",  # Use PEP 695 generic function syntax (Python 3.12+)
+  "RUF013", # implicit optional
+]
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"tests/*" = ["S101"]
+"examples/*" = ["E402", "F401", "F403"] # More lenient for examples
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

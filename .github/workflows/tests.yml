@@ -1,48 +1,46 @@
 name: Run nbdev_test on all projects
 
 on:
-  # Runs on pushes to any branch
   push:
-    branches: ['*']
+    branches: ["*"]
   pull_request:
-    branches: ['*']
+    branches: ["*"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        project:
-          - ship_model_lib
-
     steps:
+      # 1. Checkout the repo
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
+      # 2. Install uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      # 3. Set up Python 3.12
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: "3.12"
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
+      # 4. Install dependencies with uv
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: uv sync --all-extras
 
-      - name: Run nbdev_test
-        run: |
-          cd ${{ matrix.project }}
-          nbdev_test --do_print
-      
-      - name: Check formatting by black
-        run: |
-          cd ${{ matrix.project }}
-          black --check .
+      # 5. Run ruff linter
+      - name: Lint with ruff
+        run: uv run ruff check .
+
+      # 6. Check code formatting with ruff
+      - name: Check formatting with ruff
+        run: uv run ruff format --check .
+
+      # 7. Run tests with pytest
+      - name: Run tests with pytest
+        run: uv run pytest --maxfail=1 --disable-warnings -v
+        env:
+          PYTHONPATH: ${{ github.workspace }}/ship_model_lib/ship_model_lib
