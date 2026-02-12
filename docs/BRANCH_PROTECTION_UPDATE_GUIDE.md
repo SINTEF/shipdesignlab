@@ -132,6 +132,9 @@ A helper script is provided in `scripts/verify-workflows.sh` to check current wo
 
 ## Additional Resources
 
+- **Visual Guide**: See [`VISUAL_GUIDE.md`](VISUAL_GUIDE.md) for flowcharts and diagrams
+- **Screenshot Guide**: See [`SCREENSHOT_GUIDE.md`](SCREENSHOT_GUIDE.md) for visual walkthrough
+- **Verification Script**: Run `../scripts/verify-workflows.sh` to check current workflow names
 - [GitHub Docs: Branch Protection Rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/managing-a-branch-protection-rule)
 - [GitHub Docs: Status Checks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks)
 
