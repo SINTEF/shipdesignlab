@@ -34,19 +34,22 @@ from ship_model_lib.machinery import (
     PropulsionType,
 )
 from ship_model_lib.operation_profile_structure import Location, OperationPoint, Weather
-from ship_model_lib.propulsor import PropulsorDataBseries, PropulsorDataScalar
+from ship_model_lib.propulsor import (
+    PropulsorDataBseries,
+    PropulsorDataScalar,
+    WakeFractionThrustDeductionFactorPoint,
+)
 from ship_model_lib.ship_dimensions import (
     ShipDimensionsAddedResistance,
+    ShipDimensionsHollenbachSingleScrew,
     ShipDimensionsHollenbachTwinScrew,
 )
 from ship_model_lib.ship_model import (
     CalmWaterResistanceHollenbachSingleScrewBallastDraft,
     CalmWaterResistanceHollenbachSingleScrewDesignDraft,
     ShipDescription,
-    ShipDimensionsHollenbachSingleScrew,
     ShipModel,
     ShipType,
-    WakeFractionThrustDeductionFactorPoint,
 )
 
 
@@ -1312,4 +1315,4 @@ def test_ship_model_get_performance_data_from_operating_point(
             operation_point=operation_points_array
         )
     )
-    pprint(result_operation_point_hull_only_array)
+    pprint.pprint(result_operation_point_hull_only_array)

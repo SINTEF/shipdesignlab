@@ -158,6 +158,18 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = ["--verbose", "--color=yes"]
+filterwarnings = [
+  # Ignore pytest internal deprecation warnings
+  "ignore:ast\\.(Str|NameConstant|Num) is deprecated:DeprecationWarning:_pytest",
+  # Ignore matplotlib/pyparsing deprecation warnings  
+  "ignore::pyparsing.exceptions.PyparsingDeprecationWarning",
+  # Ignore numpy alltrue deprecation in pytest code
+  "ignore:`alltrue` is deprecated:DeprecationWarning",
+  # Ignore expected runtime warnings for zero speed edge cases
+  "ignore:divide by zero encountered:RuntimeWarning",
+  # Ignore numpy scalar conversion deprecation (will be fixed separately)
+  "ignore:Conversion of an array with ndim > 0 to a scalar:DeprecationWarning",
+]
 
 # Coverage configuration
 [tool.coverage.run]
