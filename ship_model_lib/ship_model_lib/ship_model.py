@@ -118,9 +118,7 @@ CalmWaterModel = Union[
     CalmWaterResistanceHollenbachSingleScrewDesignDraft,
     CalmWaterResistanceBySpeedPowerCurve,
 ]
-PropulsorModel = Union[
-    PropulsorDataBseries, PropulsorDataOpenWater, PropulsorDataScalar
-]
+PropulsorModel = Union[PropulsorDataBseries, PropulsorDataOpenWater, PropulsorDataScalar]
 AddedResistanceWaveModel = Union[
     AddedResistanceByStaWave2, AddedResistanceBySeaMarginCurve, AddedResistanceBySNNM
 ]
@@ -154,9 +152,7 @@ class ShipModel:
         power_list_kw = []
         speed_list_kn = [*range(1, 30)]
         for speed_kn in speed_list_kn:
-            if isinstance(
-                self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve
-            ):
+            if isinstance(self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve):
                 power_list_kw.append(
                     self.calm_water_resistance.get_power_from_speed(speed_kn).value
                 )
@@ -236,26 +232,18 @@ class ShipModel:
             torque_newton_meter=0.0,
             efficiency_open_water=1.0,
         )
-        shaft_power_kw = (
-            0.0 if np.isscalar(vessel_speed_kn) else np.zeros_like(vessel_speed_kn)
-        )
+        shaft_power_kw = 0.0 if np.isscalar(vessel_speed_kn) else np.zeros_like(vessel_speed_kn)
         # For semi-empirical models, we need to calculate the calm water resistance,
         # added resistance and propeller performance
         if (
-            not isinstance(
-                self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve
-            )
+            not isinstance(self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve)
             and self.calm_water_resistance is not None
         ):
             calm_water_resistance_kilo_newton = (
-                self.calm_water_resistance.get_resistance_from_speed(
-                    velocity_kn=vessel_speed_kn
-                )
+                self.calm_water_resistance.get_resistance_from_speed(velocity_kn=vessel_speed_kn)
             )
             if isinstance(calm_water_resistance_kilo_newton, Interpolated1DValue):
-                calm_water_resistance_kilo_newton = (
-                    calm_water_resistance_kilo_newton.value
-                )
+                calm_water_resistance_kilo_newton = calm_water_resistance_kilo_newton.value
             hull_operating_point.calm_water_resistance_newton = (
                 calm_water_resistance_kilo_newton * 1000
             )
@@ -273,16 +261,11 @@ class ShipModel:
                         )
                     )
                 else:
-                    sea_margin_percent = (
-                        self.added_resistance_wave.get_sea_margin_percent(
-                            significant_wave_height_m=weather.significant_wave_height_m,
-                        )
+                    sea_margin_percent = self.added_resistance_wave.get_sea_margin_percent(
+                        significant_wave_height_m=weather.significant_wave_height_m,
                     )
                     added_resistance_wave_newton = (
-                        calm_water_resistance_kilo_newton
-                        * sea_margin_percent
-                        / 100
-                        * 1000
+                        calm_water_resistance_kilo_newton * sea_margin_percent / 100 * 1000
                     )
             else:
                 added_resistance_wave_newton = 0
@@ -300,31 +283,25 @@ class ShipModel:
                 )
             else:
                 added_resistance_wind_newton = 0
-            hull_operating_point.added_resistance_wave_newton = (
-                added_resistance_wave_newton
-            )
-            hull_operating_point.added_resistance_wind_newton = (
-                added_resistance_wind_newton
-            )
+            hull_operating_point.added_resistance_wave_newton = added_resistance_wave_newton
+            hull_operating_point.added_resistance_wind_newton = added_resistance_wind_newton
             if self.propulsor is not None:
-                propulsor_operating_point = self.propulsor.get_propulsor_data_from_vessel_speed_thrust(
-                    vessel_speed_kn=vessel_speed_kn,
-                    thrust_resistance_newton=hull_operating_point.total_resistance_newton,
+                propulsor_operating_point = (
+                    self.propulsor.get_propulsor_data_from_vessel_speed_thrust(
+                        vessel_speed_kn=vessel_speed_kn,
+                        thrust_resistance_newton=hull_operating_point.total_resistance_newton,
+                    )
                 )
             shaft_power_kw = propulsor_operating_point.shaft_power_kw
         # For power curve models, we need to calculate the shaft power directly
-        elif isinstance(
-            self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve
-        ):
+        elif isinstance(self.calm_water_resistance, CalmWaterResistanceBySpeedPowerCurve):
             shaft_power_kw = self.calm_water_resistance.get_power_from_speed(
                 speed_kn=vessel_speed_kn
             ).value
             if np.isscalar(vessel_speed_kn):
                 n_rps = 1 if vessel_speed_kn > 0 else 0
                 torque_newton_meter = (
-                    shaft_power_kw / rps_to_rad_per_s(n_rps) * 1000
-                    if shaft_power_kw > 0
-                    else 0
+                    shaft_power_kw / rps_to_rad_per_s(n_rps) * 1000 if shaft_power_kw > 0 else 0
                 )
             else:
                 n_rps = np.zeros_like(vessel_speed_kn)
@@ -458,13 +435,9 @@ class ShipModel:
         else:
             power_on_source_kw = np.zeros([len(operation_point.speed_kn)])
 
-        greater_than_power_limit = np.greater(
-            power_on_source_kw, operation_point.power_limit_kw
-        )
+        greater_than_power_limit = np.greater(power_on_source_kw, operation_point.power_limit_kw)
         if np.any(greater_than_power_limit):
-            for index, greater_than_power_limit_each in enumerate(
-                greater_than_power_limit
-            ):
+            for index, greater_than_power_limit_each in enumerate(greater_than_power_limit):
                 if greater_than_power_limit_each:
                     if operation_point.weather.significant_wave_height_m:
                         significant_wave_height_m = (
@@ -473,27 +446,19 @@ class ShipModel:
                     else:
                         significant_wave_height_m = None
                     if operation_point.weather.mean_wave_period_s:
-                        mean_wave_period_s = operation_point.weather.mean_wave_period_s[
-                            index
-                        ]
+                        mean_wave_period_s = operation_point.weather.mean_wave_period_s[index]
                     else:
                         mean_wave_period_s = (None,)
                     if operation_point.weather.wave_direction_deg:
-                        wave_direction_deg = operation_point.weather.wave_direction_deg[
-                            index
-                        ]
+                        wave_direction_deg = operation_point.weather.wave_direction_deg[index]
                     else:
                         wave_direction_deg = None
                     if operation_point.weather.wind_speed_m_per_s:
-                        wind_speed_m_per_s = operation_point.weather.wind_speed_m_per_s[
-                            index
-                        ]
+                        wind_speed_m_per_s = operation_point.weather.wind_speed_m_per_s[index]
                     else:
                         wind_speed_m_per_s = None
                     if operation_point.weather.wind_direction_deg:
-                        wind_direction_deg = operation_point.weather.wind_direction_deg[
-                            index
-                        ]
+                        wind_direction_deg = operation_point.weather.wind_direction_deg[index]
                     else:
                         wind_direction_deg = None
                     if operation_point.weather.ocean_current_speed_m_per_s:
@@ -529,13 +494,11 @@ class ShipModel:
                         auxiliary_power_kw = operation_point.auxiliary_power[index]
                     else:
                         auxiliary_power_kw = 0
-                    performance_data_from_power = (
-                        self.get_ship_performance_data_from_power(
-                            power_out_source_kw=power_limit_kw,
-                            weather=weather,
-                            heading_deg=heading_deg,
-                            auxiliary_power_kw=auxiliary_power_kw,
-                        )
+                    performance_data_from_power = self.get_ship_performance_data_from_power(
+                        power_out_source_kw=power_limit_kw,
+                        weather=weather,
+                        heading_deg=heading_deg,
+                        auxiliary_power_kw=auxiliary_power_kw,
                     )
 
                     operation_point.speed_kn[index] = (

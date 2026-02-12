@@ -393,7 +393,7 @@ def test_input_data_are_the_same_length():
             wake_fraction_factor=wake_factor,
             thrust_deduction_factor=thrust_reduction,
         )
-        for vessel_speed_kn, wake_factor, thrust_reduction in zip(  # noqa: B905
+        for vessel_speed_kn, wake_factor, thrust_reduction in zip(
             data_set_vessel_speed_kn, data_set_wake_factor, data_set_thrust_reduction
         )
     ]

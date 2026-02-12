@@ -99,9 +99,7 @@ class Interpolated1DValue(InterpolatedValue):
         if self.is_too_high:
             return "value is higher than input data."
         elif self.extrapolated_with_origo:
-            return (
-                "value is below input data, but a (0,0) value is used to interpolate."
-            )
+            return "value is below input data, but a (0,0) value is used to interpolate."
         elif self.is_too_low:
             return "value is below input data."
         else:

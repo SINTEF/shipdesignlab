@@ -26,9 +26,7 @@ def test_ship_dimension_test():
     propeller_diameter = 9.81
 
     @dataclass
-    class ShipDimensionTest(
-        ShipDimensionsHollenbachSingleScrew, ShipDimensionsAddedResistance
-    ):
+    class ShipDimensionTest(ShipDimensionsHollenbachSingleScrew, ShipDimensionsAddedResistance):
         pass
 
     test_ship_dimensions = ShipDimensionTest(
@@ -46,9 +44,7 @@ def test_ship_dimension_test():
         dp_diameter_propeller_m=propeller_diameter,
     )
 
-    calm_water_hollenbach_single_screw = (
-        CalmWaterResistanceHollenbachSingleScrewDesignDraft(
-            ship_dimensions=test_ship_dimensions
-        )
+    calm_water_hollenbach_single_screw = CalmWaterResistanceHollenbachSingleScrewDesignDraft(
+        ship_dimensions=test_ship_dimensions
     )
     calm_water_hollenbach_single_screw.get_resistance_from_speed(velocity_kn=10)

@@ -78,9 +78,7 @@ class CalmWaterResistanceBase(ABC):
         x_data: np.ndarray = np.array([])
         for interval in num_points:
             step = (interval["to"] - interval["from"]) / (interval["num_points"] - 1)
-            x_data = np.append(
-                x_data, np.arange(interval["from"], interval["to"], step)
-            )  # type: ignore[no-untyped-call]
+            x_data = np.append(x_data, np.arange(interval["from"], interval["to"], step))  # type: ignore[no-untyped-call]
         x_data = np.append(x_data, y_max)  # type: ignore[no-untyped-call]
         y_data = np.zeros(x_data.shape)  # type: ignore[no-untyped-call]
         for index, x_i in enumerate(x_data):
@@ -91,9 +89,7 @@ class CalmWaterResistanceBase(ABC):
                 args=x_i,
             )
 
-        return get_interpolation_1d_function(
-            x=x_data, y=y_data, kind=kind, add_origo=True
-        )
+        return get_interpolation_1d_function(x=x_data, y=y_data, kind=kind, add_origo=True)
 
 
 class CalmWaterResistanceBySpeedPowerCurve(CalmWaterResistanceBase):
@@ -105,12 +101,7 @@ class CalmWaterResistanceBySpeedPowerCurve(CalmWaterResistanceBase):
     """
 
     def __init__(
-        self,
-        *,
-        speed_ref_kn: np.ndarray,
-        power_ref_kw: np.ndarray,
-        draft_m: float = 0,
-        trim_deg=0
+        self, *, speed_ref_kn: np.ndarray, power_ref_kw: np.ndarray, draft_m: float = 0, trim_deg=0
     ):
         self.speed_ref_kn = speed_ref_kn
         self.power_ref_kw = power_ref_kw
@@ -151,7 +142,7 @@ class CalmWaterResistanceBySpeedResistanceCurve(CalmWaterResistanceBase):
         speed_ref_kn: np.ndarray,
         resistance_ref_k_n: np.ndarray,
         draft_m: float = 0,
-        trim_deg=0
+        trim_deg=0,
     ):
         self.speed_ref_kn = speed_ref_kn
         self.resistance_ref_k_n = resistance_ref_k_n
@@ -214,9 +205,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
 
     def __init__(self, ship_dimensions):
         self.b_beam = ship_dimensions.b_beam_m
-        self.l_length_between_perpendiculars = (
-            ship_dimensions.lpp_length_between_perpendiculars_m
-        )
+        self.l_length_between_perpendiculars = ship_dimensions.lpp_length_between_perpendiculars_m
         self.ta_draft_aft = ship_dimensions.ta_draft_aft_m
         self.tf_draft_forward = ship_dimensions.tf_draft_forward_m
         self.los_length_over_surface = ship_dimensions.los_length_over_surface_m
@@ -248,8 +237,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
                 self.l_length_between_perpendiculars / self.b_beam,
                 self.b_beam / self.t_draft,
                 self.l_length_between_perpendiculars / self.t_draft,
-                (self.ta_draft_aft - self.tf_draft_forward)
-                / self.l_length_between_perpendiculars,
+                (self.ta_draft_aft - self.tf_draft_forward) / self.l_length_between_perpendiculars,
                 self.dp_diameter_propeller / self.t_draft,
             ]
         )
@@ -315,18 +303,14 @@ class CalmWaterResistanceHollenbachBase(ABC):
     @property
     def _k_ao(self) -> float:
         """Aft overhang ratio factor"""
-        ratio = min(
-            self.lwl_length_water_line / self.l_length_between_perpendiculars, 1.06
-        )
+        ratio = min(self.lwl_length_water_line / self.l_length_between_perpendiculars, 1.06)
         return ratio**self._coeff_for_aft_overhang_ratio_factor
 
     @property
     def _k_tr(self) -> float:
         """Trim correction factor"""
         return (
-            1
-            + (self.ta_draft_aft - self.tf_draft_forward)
-            / self.l_length_between_perpendiculars
+            1 + (self.ta_draft_aft - self.tf_draft_forward) / self.l_length_between_perpendiculars
         ) ** self._coeff_for_trim_correct_factor
 
     @property
@@ -342,8 +326,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
             return self.los_length_over_surface
         elif ratio <= 1.1:
             return (
-                1 / 3 * self.l_length_between_perpendiculars
-                + 2 / 3 * self.los_length_over_surface
+                1 / 3 * self.l_length_between_perpendiculars + 2 / 3 * self.los_length_over_surface
             )
         else:
             return 1.0667 * self.l_length_between_perpendiculars
@@ -463,17 +446,11 @@ class CalmWaterResistanceHollenbachBase(ABC):
         form_factor_for_bilge_keel = 0.4
         if area_appendage == 0:
             return 0
-        equiv_factor = (
-            (1 + form_factor_for_bilge_keel) * self.area_bilge_keel / area_appendage
-        )
+        equiv_factor = (1 + form_factor_for_bilge_keel) * self.area_bilge_keel / area_appendage
         c_f = self._get_c_f(velocity)
-        r_app = (
-            0.5 * self.rho_seawater * velocity**2 * area_appendage * equiv_factor * c_f
-        )
+        r_app = 0.5 * self.rho_seawater * velocity**2 * area_appendage * equiv_factor * c_f
         r_th = self._get_r_th(velocity)
-        return (r_app + r_th) / (
-            0.5 * self.rho_seawater * velocity**2 * self.wetted_surface_area
-        )
+        return (r_app + r_th) / (0.5 * self.rho_seawater * velocity**2 * self.wetted_surface_area)
 
     def _get_total_resistance_mean(self, velocity_kn: Numeric) -> Numeric:
         """Calculates the total mean resistance of a ship using Hollenbach relation"""
@@ -575,10 +552,8 @@ class CalmWaterResistanceHollenbachBase(ABC):
             resistance_function = self._get_total_resistance_min
         elif resistance_level == ResistanceLevel.MEAN:
             if form_factor is not None:
-                resistance_function = (
-                    lambda speed: self._get_total_resistance_mean_minsaas(
-                        speed, form_factor=form_factor
-                    )
+                resistance_function = lambda speed: self._get_total_resistance_mean_minsaas(
+                    speed, form_factor=form_factor
                 )
             else:
                 resistance_function = self._get_total_resistance_mean
@@ -598,9 +573,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         return sol.root
 
 
-class CalmWaterResistanceHollenbachSingleScrewDesignDraft(
-    CalmWaterResistanceHollenbachBase
-):
+class CalmWaterResistanceHollenbachSingleScrewDesignDraft(CalmWaterResistanceHollenbachBase):
     def __init__(self, ship_dimensions: ShipDimensionsHollenbachSingleScrew):
         super().__init__(ship_dimensions)
 
@@ -636,9 +609,7 @@ class CalmWaterResistanceHollenbachSingleScrewDesignDraft(
         return fn / self._fn_critical
 
 
-class CalmWaterResistanceHollenbachSingleScrewBallastDraft(
-    CalmWaterResistanceHollenbachBase
-):
+class CalmWaterResistanceHollenbachSingleScrewBallastDraft(CalmWaterResistanceHollenbachBase):
     _coeff_for_shape_factor: np.ndarray = np.array(
         [-0.8037, 0.2726, 0.7133, 0.6699, 0.0243, 0.0265, -0.0061, 0.2349, 0.0131]
     )
@@ -671,9 +642,7 @@ class CalmWaterResistanceHollenbachSingleScrewBallastDraft(
         return self._get_c_r(fn)
 
 
-class CalmWaterResistanceHollenbachTwinScrewDesignDraft(
-    CalmWaterResistanceHollenbachBase
-):
+class CalmWaterResistanceHollenbachTwinScrewDesignDraft(CalmWaterResistanceHollenbachBase):
     _coeff_for_shape_factor: np.ndarray = np.array(
         [-0.4319, 0.1685, 0.5637, 0.5891, 0.0033, 0.0134, -0.0005, 2.7932, 0.0072]
     )

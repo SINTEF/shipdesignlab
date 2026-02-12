@@ -425,7 +425,7 @@ def wake_fraction_thrust_deduction_values(vessel_speed_kn, wake_factor, thrust_d
             thrust_deduction_factor=thrust_deduction_each,
             vessel_speed_kn=vessel_speed_each,
         )
-        for wake_factor_each, thrust_deduction_each, vessel_speed_each in zip(  # noqa: B905
+        for wake_factor_each, thrust_deduction_each, vessel_speed_each in zip(
             wake_factor, thrust_deduction, vessel_speed_kn
         )
     ]

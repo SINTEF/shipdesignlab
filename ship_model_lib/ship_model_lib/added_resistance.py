@@ -107,18 +107,14 @@ class JONSWAPSpectrumITTC1984:
     @property
     def _a_coefficient(self) -> float:
         return (
-            155
-            * np.power(self.significant_wave_height_m, 2)
-            / np.power(self.mean_wave_period_s, 4)
+            155 * np.power(self.significant_wave_height_m, 2) / np.power(self.mean_wave_period_s, 4)
         )
 
     @property
     def _b_coefficient(self) -> float:
         return 944 / np.power(self.mean_wave_period_s, 4)
 
-    def _get_exponent_for_peak_shape_parameter(
-        self, omega_rad_per_s: Numeric
-    ) -> Numeric:
+    def _get_exponent_for_peak_shape_parameter(self, omega_rad_per_s: Numeric) -> Numeric:
         if np.isscalar(omega_rad_per_s):
             sigma = 0.07 if omega_rad_per_s < (5.24 / self.mean_wave_period_s) else 0.09
         else:
@@ -126,8 +122,7 @@ class JONSWAPSpectrumITTC1984:
             sigma[omega_rad_per_s < (5.24 / self.mean_wave_period_s)] = 0.07
             sigma[omega_rad_per_s >= (5.24 / self.mean_wave_period_s)] = 0.09
         return np.exp(
-            -np.power(0.191 * omega_rad_per_s * self.mean_wave_period_s - 1, 2)
-            / (2 * sigma)
+            -np.power(0.191 * omega_rad_per_s * self.mean_wave_period_s - 1, 2) / (2 * sigma)
         )
 
     def get_spectral_density_omega(self, *, omega_rad_per_s: Numeric) -> Numeric:
@@ -135,9 +130,7 @@ class JONSWAPSpectrumITTC1984:
             self._a_coefficient
             / np.power(omega_rad_per_s, 5)
             * np.exp(-self._b_coefficient / np.power(omega_rad_per_s, 4))
-            * np.power(
-                self.gamma, self._get_exponent_for_peak_shape_parameter(omega_rad_per_s)
-            )
+            * np.power(self.gamma, self._get_exponent_for_peak_shape_parameter(omega_rad_per_s))
         )
 
 
@@ -205,9 +198,7 @@ class AddedResistance(ABC):
         pass
 
     @staticmethod
-    def _get_encounter_angle_deg(
-        *, wave_direction_deg: Numeric, heading_deg: Numeric
-    ) -> Numeric:
+    def _get_encounter_angle_deg(*, wave_direction_deg: Numeric, heading_deg: Numeric) -> Numeric:
         """Calculate the encounter angle between the wave and the ship"""
         wave_encounter_angles = (wave_direction_deg - heading_deg) % 360
         if np.isscalar(wave_encounter_angles):
@@ -231,21 +222,14 @@ class AddedResistanceByStaWave2(AddedResistance):
     ) -> Numeric:
         """Calculate added resistance for a given speed and weather"""
         vessel_speed_kn = np.atleast_1d(vessel_speed_kn)
-        if (
-            weather.significant_wave_height_m is None
-            or weather.mean_wave_period_s is None
-        ):
-            raise ValueError(
-                "Weather must contain significant wave height and mean wave period"
-            )
+        if weather.significant_wave_height_m is None or weather.mean_wave_period_s is None:
+            raise ValueError("Weather must contain significant wave height and mean wave period")
         added_resistance_result_list = []
         wave_encounter_angles = np.zeros_like(vessel_speed_kn)
         if heading_deg is not None:
             heading_deg = np.atleast_1d(heading_deg)
             if weather.wave_direction_deg is None:
-                raise ValueError(
-                    "Weather must contain wave direction when heading is given"
-                )
+                raise ValueError("Weather must contain wave direction when heading is given")
             wave_encounter_angles = self._get_encounter_angle_deg(
                 wave_direction_deg=np.atleast_1d(weather.wave_direction_deg),
                 heading_deg=heading_deg,
@@ -304,9 +288,7 @@ class AddedResistanceByStaWave2(AddedResistance):
             * GRAVITY
             * np.power(weather.significant_wave_height_m, 2)
             * self.ship_dimension.b_beam_m
-            * self._get_alpha1(
-                omega_rad_per_s=omega_rad_per_s, speed_m_per_s=speed_m_per_s
-            )
+            * self._get_alpha1(omega_rad_per_s=omega_rad_per_s, speed_m_per_s=speed_m_per_s)
         )
 
     def _get_alpha1(self, *, omega_rad_per_s: float, speed_m_per_s: float) -> float:
@@ -340,9 +322,7 @@ class AddedResistanceByStaWave2(AddedResistance):
             * GRAVITY
             * np.power(weather.significant_wave_height_m, 2)
             * np.power(self.ship_dimension.b_beam_m, 2)
-            * self._get_raw(
-                omega_rad_per_s=omega_rad_per_s, speed_m_per_s=speed_m_per_s
-            )
+            * self._get_raw(omega_rad_per_s=omega_rad_per_s, speed_m_per_s=speed_m_per_s)
             / self.ship_dimension.lpp_length_between_perpendiculars_m
         )
 
@@ -389,9 +369,7 @@ class AddedResistanceByStaWave2(AddedResistance):
         if b / t < 2.2 or b / t > 5.5:
             logger.warning("B/T is out of range. It should be between 2.2 and 5.5.")
         if fr < 0.1 or fr > 0.3:
-            logger.warning(
-                "Froude number is out of range. It should be between 0.1 and 0.3."
-            )
+            logger.warning("Froude number is out of range. It should be between 0.1 and 0.3.")
         if cb < 0.5 or cb > 0.9:
             logger.warning("Cb is out of range. It should be between 0.5 and 0.9.")
 
@@ -416,15 +394,11 @@ class AddedResistanceBySNNM(AddedResistance):
 
     @property
     def angle_for_shadowed_part_aft_deg(self) -> float:
-        return np.rad2deg(
-            np.arctan(0.495 * self.ship_dimension.b_beam_m / self.length_of_run)
-        )
+        return np.rad2deg(np.arctan(0.495 * self.ship_dimension.b_beam_m / self.length_of_run))
 
     @property
     def angle_for_shadowed_part_forward_deg(self) -> float:
-        return np.rad2deg(
-            np.arctan(0.495 * self.ship_dimension.b_beam_m / self.length_of_entrance)
-        )
+        return np.rad2deg(np.arctan(0.495 * self.ship_dimension.b_beam_m / self.length_of_entrance))
 
     def _get_length_of_entrance(self):
         """Calculate the length of entrance
@@ -499,22 +473,18 @@ class AddedResistanceBySNNM(AddedResistance):
             a1_following = self._get_a1_following_sea(
                 v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega
             )
-            result = a1_beam + (wave_incident_angle_rad - np.pi / 2) * (
-                a1_following - a1_beam
-            ) / (np.pi / 2)
-        else:  # Following - stern sea
-            result = self._get_a1_following_sea(
-                v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega
+            result = a1_beam + (wave_incident_angle_rad - np.pi / 2) * (a1_following - a1_beam) / (
+                np.pi / 2
             )
+        else:  # Following - stern sea
+            result = self._get_a1_following_sea(v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega)
         if result.size == 1:
             return result[0]
         return result
 
     @property
     def _t_deep(self):
-        return max(
-            [self.ship_dimension.ta_draft_aft_m, self.ship_dimension.tf_draft_forward_m]
-        )
+        return max([self.ship_dimension.ta_draft_aft_m, self.ship_dimension.tf_draft_forward_m])
 
     def _get_a1_following_sea(self, *, v_s: float, omega: np.ndarray) -> np.ndarray:
         """Calculate a1 following sea"""
@@ -527,15 +497,11 @@ class AddedResistanceBySNNM(AddedResistance):
         else:
             index = v_s < v_g / 2
             result[index] = (
-                -self._get_a1_head_sea(fr=0, alpha=0)
-                * (v_g[index] / 2 - v_s)
-                / (v_g[index] / 2)
+                -self._get_a1_head_sea(fr=0, alpha=0) * (v_g[index] / 2 - v_s) / (v_g[index] / 2)
             )
             index = np.bitwise_and(v_s >= v_g / 2, v_s < v_g)
             result[index] = (
-                self._get_a1_head_sea(fr=0, alpha=0)
-                * (v_s - v_g[index] / 2)
-                / (v_g[index] / 2)
+                self._get_a1_head_sea(fr=0, alpha=0) * (v_s - v_g[index] / 2) / (v_g[index] / 2)
             )
             index = v_s >= v_g
             result[index] = self._get_a1_head_sea(fr=fr_rel[index], alpha=0)
@@ -565,27 +531,15 @@ class AddedResistanceBySNNM(AddedResistance):
         alpha = wave_incident_angle_rad % (2 * np.pi)
         alpha = alpha if wave_incident_angle_rad <= np.pi else 2 * np.pi - alpha
         if alpha <= np.pi / 2:  # Head - beam sea
-            result = (
-                0.0072 + 0.1676 * fr
-                if fr < 0.12
-                else np.power(fr, 1.5) * np.exp(-3.5 * fr)
-            )
+            result = 0.0072 + 0.1676 * fr if fr < 0.12 else np.power(fr, 1.5) * np.exp(-3.5 * fr)
         elif np.pi / 2 < alpha < np.pi:  # Beam / following sea
-            a2_beam = (
-                0.0072 + 0.1676 * fr
-                if fr < 0.12
-                else np.power(fr, 1.5) * np.exp(-3.5 * fr)
-            )
+            a2_beam = 0.0072 + 0.1676 * fr if fr < 0.12 else np.power(fr, 1.5) * np.exp(-3.5 * fr)
             a2_following = self._get_a2_following_sea(
                 v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega
             )
-            result = a2_beam + (alpha - np.pi / 2) / (np.pi / 2) * (
-                a2_following - a2_beam
-            )
+            result = a2_beam + (alpha - np.pi / 2) / (np.pi / 2) * (a2_following - a2_beam)
         else:  # Following - stern sea
-            result = self._get_a2_following_sea(
-                v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega
-            )
+            result = self._get_a2_following_sea(v_s=kn_to_m_per_s(vessel_speed_kn), omega=omega)
         return result
 
     def _get_a2_following_sea(self, *, v_s: float, omega: np.ndarray) -> np.ndarray:
@@ -596,15 +550,13 @@ class AddedResistanceBySNNM(AddedResistance):
         fr = self._get_froude_number(speed_m_per_s=v_s)
         result = np.ones_like(omega)
         a2_at_0 = 0.0072
-        a2_at_0_5_v_g = (
-            0.0072 + 0.1676 * fr if fr < 0.12 else np.power(fr, 1.5) * np.exp(-3.5 * fr)
-        )
+        a2_at_0_5_v_g = 0.0072 + 0.1676 * fr if fr < 0.12 else np.power(fr, 1.5) * np.exp(-3.5 * fr)
         index = v_s <= v_g / 2
         result[index] = a2_at_0 + (a2_at_0_5_v_g - a2_at_0) * v_s / (v_g[index] / 2)
         index = np.bitwise_and(v_s > v_g / 2, v_s < v_g)
-        result[index] = a2_at_0_5_v_g + (0.0072 - a2_at_0_5_v_g) * (
-            v_s - v_g[index] / 2
-        ) / (v_g[index] / 2)
+        result[index] = a2_at_0_5_v_g + (0.0072 - a2_at_0_5_v_g) * (v_s - v_g[index] / 2) / (
+            v_g[index] / 2
+        )
         index = np.bitwise_and(v_s > v_g, fr_rel < 0.12)
         result[index] = 0.0072 + 0.1676 * fr_rel[index]
         index = np.bitwise_and(v_s > v_g, fr_rel >= 0.12)
@@ -615,10 +567,7 @@ class AddedResistanceBySNNM(AddedResistance):
     def _trim_angle_rad(self):
         """Calculate trim angle"""
         return np.arctan(
-            np.abs(
-                self.ship_dimension.ta_draft_aft_m
-                - self.ship_dimension.tf_draft_forward_m
-            )
+            np.abs(self.ship_dimension.ta_draft_aft_m - self.ship_dimension.tf_draft_forward_m)
             / self.ship_dimension.lpp_length_between_perpendiculars_m
         )
 
@@ -635,9 +584,7 @@ class AddedResistanceBySNNM(AddedResistance):
         vessel_speed_kn: float,
     ) -> Numeric:
         """Calculate omega normalized"""
-        wave_length_m = get_wave_length(
-            wave_frequency_rad_per_s=wave_frequency_rad_per_s
-        )
+        wave_length_m = get_wave_length(wave_frequency_rad_per_s=wave_frequency_rad_per_s)
         kyy = self.ship_dimension.kyy_radius_gyration_in_lateral_direction_non_dim
         lpp = self.ship_dimension.lpp_length_between_perpendiculars_m
         cb = self.ship_dimension.cb_block_coefficient
@@ -717,9 +664,7 @@ class AddedResistanceBySNNM(AddedResistance):
         gamma1 = gamma(1 + 2 * spreading_parameter)
         gamma2 = gamma(1 + spreading_parameter)
         angle_between = (wave_direction_rad - encounter_angle_rad) % (2 * np.pi)
-        angle_between = (
-            angle_between - 2 * np.pi if angle_between > np.pi else angle_between
-        )
+        angle_between = angle_between - 2 * np.pi if angle_between > np.pi else angle_between
         angle_between = np.abs(angle_between)
         if angle_between > np.pi / 2:
             return 0.0
@@ -751,10 +696,7 @@ class AddedResistanceBySNNM(AddedResistance):
         index = wave_length_m / lpp <= 2.5
         result = np.zeros([4, *omega.shape])
         result[:, index] = 1 - np.exp(
-            -4
-            * np.pi
-            * draft_array[:, index]
-            * (1 / wave_length_m[index] - 1 / (2.5 * lpp))
+            -4 * np.pi * draft_array[:, index] * (1 / wave_length_m[index] - 1 / (2.5 * lpp))
         )
         return result
 
@@ -792,38 +734,22 @@ class AddedResistanceBySNNM(AddedResistance):
         if 0 <= alpha <= np.pi - e_1:
             components[0] = (
                 np.power(np.sin(e_1 + alpha), 2)
-                + 2
-                * omega
-                * v_s
-                / GRAVITY
-                * (np.cos(alpha) - np.cos(e_1) * np.cos(e_1 + alpha))
+                + 2 * omega * v_s / GRAVITY * (np.cos(alpha) - np.cos(e_1) * np.cos(e_1 + alpha))
             ) * np.power(0.87 / c_b, (1 + 4 * np.sqrt(fr)) * f_alpha)
         if 0 <= alpha <= e_1:
             components[1] = (
                 np.power(np.sin(e_1 - alpha), 2)
-                + 2
-                * omega
-                * v_s
-                / GRAVITY
-                * (np.cos(alpha) - np.cos(e_1) * np.cos(e_1 - alpha))
+                + 2 * omega * v_s / GRAVITY * (np.cos(alpha) - np.cos(e_1) * np.cos(e_1 - alpha))
             ) * np.power(0.87 / c_b, (1 + 4 * np.sqrt(fr)) * f_alpha)
         if e_2 <= alpha <= np.pi:
             components[2] = -(
                 np.power(np.sin(e_2 - alpha), 2)
-                + 2
-                * omega
-                * v_s
-                / GRAVITY
-                * (np.cos(alpha) - np.cos(e_2) * np.cos(e_2 - alpha))
+                + 2 * omega * v_s / GRAVITY * (np.cos(alpha) - np.cos(e_2) * np.cos(e_2 - alpha))
             )
         if np.pi - e_2 <= alpha <= np.pi:
             components[3] = -(
                 np.power(np.sin(e_2 + alpha), 2)
-                + 2
-                * omega
-                * v_s
-                / GRAVITY
-                * (np.cos(alpha) - np.cos(e_2) * np.cos(e_2 + alpha))
+                + 2 * omega * v_s / GRAVITY * (np.cos(alpha) - np.cos(e_2) * np.cos(e_2 + alpha))
             )
         result = common_factor * np.sum(a_t * components, axis=0)
         if result.size == 1:
@@ -845,19 +771,15 @@ class AddedResistanceBySNNM(AddedResistance):
         @param vessel_speed_kn: vessel speed in knots
         @returns the wave resistance in N
         """
-        resistance_due_to_reflection = (
-            self._get_non_dimensional_wave_resistance_due_to_reflection(
-                wave_frequency_rad_per_s=wave_frequency_rad_per_s,
-                wave_incident_angle_rad=wave_incident_angle_rad,
-                vessel_speed_kn=vessel_speed_kn,
-            )
+        resistance_due_to_reflection = self._get_non_dimensional_wave_resistance_due_to_reflection(
+            wave_frequency_rad_per_s=wave_frequency_rad_per_s,
+            wave_incident_angle_rad=wave_incident_angle_rad,
+            vessel_speed_kn=vessel_speed_kn,
         )
-        resistance_due_to_motion = (
-            self._get_non_dimensional_wave_resistance_due_to_motion(
-                wave_frequency_rad_per_s=wave_frequency_rad_per_s,
-                wave_incident_angle_rad=wave_incident_angle_rad,
-                vessel_speed_kn=vessel_speed_kn,
-            )
+        resistance_due_to_motion = self._get_non_dimensional_wave_resistance_due_to_motion(
+            wave_frequency_rad_per_s=wave_frequency_rad_per_s,
+            wave_incident_angle_rad=wave_incident_angle_rad,
+            vessel_speed_kn=vessel_speed_kn,
         )
         return resistance_due_to_reflection[0] + resistance_due_to_motion
 
@@ -932,9 +854,7 @@ class AddedResistanceBySNNM(AddedResistance):
                 mean_wave_period_s=mean_wave_period_s,
             )
         )
-        energy_density = wave_spectrum.get_spectral_density_omega(
-            omega_rad_per_s=omega_rad_per_s
-        )
+        energy_density = wave_spectrum.get_spectral_density_omega(omega_rad_per_s=omega_rad_per_s)
         result = wave_resistance * angular_distribution * energy_density
         if omega_is_scalar:
             return result[0]
@@ -1025,14 +945,10 @@ class AddedResistanceBySNNM(AddedResistance):
             wave_direction_deg=np.atleast_1d(weather.wave_direction_deg),
             heading_deg=heading_deg_array,
         )
-        significant_wave_height_m_array = np.atleast_1d(
-            weather.significant_wave_height_m
-        )
+        significant_wave_height_m_array = np.atleast_1d(weather.significant_wave_height_m)
         mean_wave_period_s_array = np.atleast_1d(weather.mean_wave_period_s)
         if speed_kn_array.size != encounter_angle_deg_array.size:
-            raise ValueError(
-                "The size of speed_kn and encounter_angle_deg should be the same."
-            )
+            raise ValueError("The size of speed_kn and encounter_angle_deg should be the same.")
         if speed_kn_array.size != significant_wave_height_m_array.size:
             raise ValueError(
                 "The size of speed_kn and significant_wave_height_m should be the same."
@@ -1079,9 +995,7 @@ class AddedResistanceWindITTC:
         df_cx = pd.read_csv(_PATH_TO_CX_DATA)
         data_label = "laden" if self.is_laden else "ballast"
         data_label = f"{self.ship_type.value}_{data_label}"
-        self._interpolate_cx = interpolate.PchipInterpolator(
-            x=df_cx["angle"], y=df_cx[data_label]
-        )
+        self._interpolate_cx = interpolate.PchipInterpolator(x=df_cx["angle"], y=df_cx[data_label])
 
     @staticmethod
     def _get_relative_wind_angle_and_speed(
@@ -1111,9 +1025,7 @@ class AddedResistanceWindITTC:
             vector_rel_vw[index_vs_non_zero], axis=1
         )
         index_rel_wind_speed_non_zero = rel_wind_speed_m_per_s != 0
-        index_non_zero = np.bitwise_and(
-            index_vs_non_zero, index_rel_wind_speed_non_zero
-        )
+        index_non_zero = np.bitwise_and(index_vs_non_zero, index_rel_wind_speed_non_zero)
         rel_wind_angle_rad[index_non_zero] = np.arccos(
             np.sum(vector_vs[index_non_zero] * -vector_rel_vw[index_non_zero], axis=1)
             / (vs[index_non_zero] * rel_wind_speed_m_per_s[index_non_zero])
@@ -1146,8 +1058,5 @@ class AddedResistanceWindITTC:
             0.5
             * RHO_AIR
             * self.transverse_area_m2
-            * (
-                c_da * np.power(rel_wind_speed_m_per_s, 2)
-                + c_da_0 * np.power(speed_m_per_s, 2)
-            )
+            * (c_da * np.power(rel_wind_speed_m_per_s, 2) + c_da_0 * np.power(speed_m_per_s, 2))
         )

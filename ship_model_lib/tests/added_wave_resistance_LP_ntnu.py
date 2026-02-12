@@ -222,9 +222,7 @@ def Radiation_head_waves(Lpp, T, Tf, Ta, B, CB, Fn, lambda_, alpha, Vs, Vc, kyy)
     d1 = np.zeros(np.size(W))
 
     d1[W < 1] = 566 * (Lpp * CB / B) ** (-2.66)
-    d1[W >= 1] = (
-        -566 * (Lpp / B) ** (-2.66) * (4 - (125 * np.arctan(np.abs(Ta - Tf) / Lpp)))
-    )
+    d1[W >= 1] = -566 * (Lpp / B) ** (-2.66) * (4 - (125 * np.arctan(np.abs(Ta - Tf) / Lpp)))
 
     R_AWML = 4 * a1 * a2 * a3 * (W**b1) * np.exp((b1 / d1) * (1 - W**d1))
 
@@ -288,8 +286,7 @@ def Diffraction(Lpp, B, T, Vs, Fn, CB, E1, E2, alpha, lambda_, omega, g):
             * alpha_T
             * (
                 (np.sin(E1 - alpha)) ** 2
-                + (2 * omega * Vs / g)
-                * (np.cos(E1) * np.cos(E1 - alpha) - np.cos(alpha))
+                + (2 * omega * Vs / g) * (np.cos(E1) * np.cos(E1 - alpha) - np.cos(alpha))
             )
             * (0.87 / CB) ** ((1 + 4 * np.sqrt(Fn)) * f)
         )
@@ -305,8 +302,7 @@ def Diffraction(Lpp, B, T, Vs, Fn, CB, E1, E2, alpha, lambda_, omega, g):
             * alpha_T
             * (
                 (np.sin(E1 + alpha)) ** 2
-                + (2 * omega * Vs / g)
-                * ((np.cos(E1) * np.cos(E1 + alpha)) - np.cos(alpha))
+                + (2 * omega * Vs / g) * ((np.cos(E1) * np.cos(E1 + alpha)) - np.cos(alpha))
             )
             * (0.87 / CB) ** ((1 + 4 * np.sqrt(Fn)) * f)
         )
@@ -326,8 +322,7 @@ def Diffraction(Lpp, B, T, Vs, Fn, CB, E1, E2, alpha, lambda_, omega, g):
             * alpha_T
             * (
                 (np.sin(E2 + alpha)) ** 2
-                + (2 * omega * Vs / g)
-                * (np.cos(E2) * np.cos(E2 + alpha) - np.cos(alpha))
+                + (2 * omega * Vs / g) * (np.cos(E2) * np.cos(E2 + alpha) - np.cos(alpha))
             )
         )
 
@@ -347,8 +342,7 @@ def Diffraction(Lpp, B, T, Vs, Fn, CB, E1, E2, alpha, lambda_, omega, g):
             * alpha_T
             * (
                 (np.sin(E2 - alpha)) ** 2
-                + (2 * omega * Vs / g)
-                * (np.cos(E2) * np.cos(E2 - alpha) - np.cos(alpha))
+                + (2 * omega * Vs / g) * (np.cos(E2) * np.cos(E2 - alpha) - np.cos(alpha))
             )
         )
 
