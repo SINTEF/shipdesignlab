@@ -1,4 +1,4 @@
-name: test (ship_model_lib)
+name: Run nbdev_test on all projects
 
 on:
   push:
