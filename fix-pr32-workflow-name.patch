@@ -1,0 +1,17 @@
+From: GitHub Copilot
+Subject: Fix pending check issue by restoring workflow name
+
+The PR changes the workflow name, which causes GitHub to wait for
+the old required status check that no longer runs. This patch
+restores the original workflow name while keeping all other changes.
+
+diff --git a/.github/workflows/tests.yml b/.github/workflows/tests.yml
+index a0a8baf..1ad00b0 100644
+--- a/.github/workflows/tests.yml
++++ b/.github/workflows/tests.yml
+@@ -1,4 +1,4 @@
+-name: Run tests and formatting checks
++name: Run nbdev_test on all projects
+ 
+ on:
+   push:
