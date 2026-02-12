@@ -41,4 +41,4 @@ def test_interpolation_1d_function():
     x_new = np.linspace(0, 5, 51)
     y_new = interp_function_with_origo(x_new).value
     fig.add_trace(go.Scatter(x=x_new, y=y_new, name="Interpolation with adding the origin"))
-    fig.show(renderer="browser")
+    fig.show()

@@ -843,7 +843,7 @@ def test_pierson_moskowitz_spectrum_ittc1978():
         )
         spectrum_density = spectrum_jonswap.get_spectral_density_omega(omega_rad_per_s=omega)
         fig.add_trace(go.Scatter(x=omega, y=spectrum_density, name=rf"$JONSWAP-\gamma-{gamma}$"))
-    fig.show(renderer="browser")
+    fig.show()
 
 
 def test_added_resistance_reference_from_langx_maow():
@@ -905,7 +905,7 @@ def test_added_resistance_reference_from_langx_maow():
     )
     fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_list, name="JONSWAP"))
     fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz"))
-    fig.show(renderer="browser")
+    fig.show()
 
     weather.wave_direction_deg = np.array([180])
     heading = weather.wave_direction_deg - (45 + random.random() * 100)

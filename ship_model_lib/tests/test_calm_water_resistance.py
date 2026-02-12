@@ -35,7 +35,7 @@ def test_calm_water_resistance_by_speed_resistance_curve():
     speed_estimated = resistance_model.get_speed_from_power(power_kw=power_new)
     fig.add_trace(go.Scatter(x=speed_estimated.value, y=power_new, name="Speed Estimated"))
     fig.update_layout(title="Speed vs Power")
-    fig.show(renderer="browser")
+    fig.show()
 
     file_path = os.path.join(
         os.path.dirname(__file__),
@@ -65,7 +65,7 @@ def test_calm_water_resistance_by_speed_resistance_curve():
     speed_estimated = resistance_model.get_speed_from_resistance(resistance_k_n=resistance_new)
     fig.add_trace(go.Scatter(x=speed_estimated.value, y=resistance_new, name="Speed Estimated"))
     fig.update_layout(title="Speed vs Resistance Force")
-    fig.show(renderer="browser")
+    fig.show()
 
 
 def test_the_code_for_hollenbach_method():
@@ -134,7 +134,7 @@ def test_the_code_for_hollenbach_method():
     fig.add_trace(
         go.Scatter(x=[speed_kn_estimated], y=[resistance_k_n_ref], name="Resistance to speed")
     )
-    fig.show(renderer="browser")
+    fig.show()
 
     assert np.isclose(speed_kn_ref, speed_kn_estimated), (
         f"The estimated speed - {speed_kn_estimated} - is not equal to the answer - {speed_kn_ref}."
@@ -240,7 +240,7 @@ def test_the_code_for_hollenbach_method():
                 df_output_resistance[col_name].values,
             )
         )
-    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show(renderer="browser")
+    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show()
 
     ship_dimensions_twin_screw = ShipDimensionsHollenbachTwinScrew(
         b_beam_m=b_beam,
@@ -277,4 +277,4 @@ def test_the_code_for_hollenbach_method():
     fig = df_output.plot()
     fig.update_xaxes(title="Speed [kn]")
     fig.update_yaxes(title="Resistance [kN]")
-    fig.show(renderer="browser")
+    fig.show()

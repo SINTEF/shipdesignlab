@@ -269,7 +269,7 @@ def test_emission_factor():
         emission_type=EmissionType.NOX,
         rated_power_kw=rated_power_kw,
     )
-    emission_factor.get_emission_plot().show(renderer="browser")
+    emission_factor.get_emission_plot().show()
     emission_calculated = emission_factor.get_emission_kg_per_h(power_kw)
     assert np.isclose(emission_calculated, emissions_ref), (
         f"Emission value is not correct: {emission_calculated} vs {emissions_ref}"
