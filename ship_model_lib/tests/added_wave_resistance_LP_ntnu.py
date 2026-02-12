@@ -1,8 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-from plotly.subplots import make_subplots
 import pandas as pd
+from plotly.subplots import make_subplots
+from scipy.interpolate import interp1d
 
 pd.options.plotting.backend = "plotly"
 
@@ -188,9 +187,7 @@ def Radiation_head_waves(Lpp, T, Tf, Ta, B, CB, Fn, lambda_, alpha, Vs, Vc, kyy)
     R_AWML: float
         added resistance due to motion (radiation), longer wave length range dominant
     """
-    if alpha >= np.pi / 2:
-        a1, a2 = a_value(Lpp, B, T, Vs, Vc, Fn, CB, alpha, kyy)
-    elif alpha == 0:
+    if alpha >= np.pi / 2 or alpha == 0:
         a1, a2 = a_value(Lpp, B, T, Vs, Vc, Fn, CB, alpha, kyy)
     else:
         a1_head, a2_head = a_value(Lpp, B, T, Vs, Vc, Fn, CB, np.pi / 2, kyy)

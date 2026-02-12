@@ -1,7 +1,8 @@
-from ship_model_lib.utility import get_interpolation_1d_function
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+from ship_model_lib.utility import get_interpolation_1d_function
 
 
 def test_interpolation_1d_function():
@@ -50,4 +51,4 @@ def test_interpolation_1d_function():
     fig.add_trace(
         go.Scatter(x=x_new, y=y_new, name="Interpolation with adding the origin")
     )
-    fig.show(renderer="png")
+    fig.show(renderer="browser")

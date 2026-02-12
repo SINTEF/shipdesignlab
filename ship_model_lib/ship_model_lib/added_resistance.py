@@ -1,26 +1,26 @@
 import logging
 import os
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Callable, Union, TypeVar, Tuple
+from typing import TypeVar
 
+import numpy as np
 import pandas as pd
-from .operation_profile_structure import Weather
 from scipy import interpolate
-from scipy.special import jv, yv
-from scipy.integrate import quad, dblquad, simpson
-from scipy.special import gamma
+from scipy.integrate import dblquad, quad, simpson
+from scipy.special import gamma, jv, yv
 
-from .ship_types import WaveSpectrumType, ShipType
 from ship_model_lib.utility import (
-    get_interpolation_1d_function,
     Interpolated1DValue,
+    get_interpolation_1d_function,
     kn_to_m_per_s,
 )
-from .ship_dimensions import ShipDimensionsAddedResistance
-import numpy as np
 
+from .operation_profile_structure import Weather
+from .ship_dimensions import ShipDimensionsAddedResistance
+from .ship_types import ShipType, WaveSpectrumType
 
 Numeric = TypeVar("Numeric ", float, np.ndarray)
 
@@ -162,7 +162,7 @@ class AddedResistance(ABC):
 
     def _get_wave_spectrum(
         self, *, weather: Weather
-    ) -> Union[PiersonMoskowitzSpectrumITTC1978, JONSWAPSpectrumITTC1984]:
+    ) -> PiersonMoskowitzSpectrumITTC1978 | JONSWAPSpectrumITTC1984:
         """Returns the wave spectrum object."""
         if self.wave_spectrum_type == WaveSpectrumType.PIERSON_MOSKOWITZ_ITTC_1978:
             return PiersonMoskowitzSpectrumITTC1978(
@@ -764,7 +764,7 @@ class AddedResistanceBySNNM(AddedResistance):
         wave_frequency_rad_per_s: Numeric,
         wave_incident_angle_rad: float,
         vessel_speed_kn: float,
-    ) -> Tuple[Numeric, np.ndarray]:
+    ) -> tuple[Numeric, np.ndarray]:
         """Calculate the wave resistance due to reflection
 
         @param wave_frequency_rad_per_s: Wave frequency in rad/s, can be a vector
@@ -1086,7 +1086,7 @@ class AddedResistanceWindITTC:
     @staticmethod
     def _get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s: np.ndarray, weather: Weather, heading_deg: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Get the relative wind angle in radian and speed in m/s"""
         vs = np.atleast_1d(vessel_speed_m_per_s)
         rel_wind_speed_m_per_s = np.zeros_like(vs)

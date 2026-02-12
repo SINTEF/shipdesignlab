@@ -1,10 +1,11 @@
 import dataclasses
 import enum
+from collections.abc import Callable
 from enum import IntEnum
-from typing import Generic, TypeVar, List, Union, Callable
+from typing import Generic, TypeVar, Union
 
-from scipy.interpolate import interp1d
 import numpy as np
+from scipy.interpolate import interp1d
 
 Numeric = Union[float, np.ndarray]
 
@@ -110,7 +111,7 @@ class Interpolated1DValue(InterpolatedValue):
 class Result(Generic[T]):
     def __init__(self, value: T, *warnings: WarningMessage) -> None:
         self.value: T = value
-        self.warnings: List[WarningMessage] = list(warnings)
+        self.warnings: list[WarningMessage] = list(warnings)
 
     def append_warning(self, *warning: WarningMessage) -> None:
         self.warnings += warning
@@ -121,7 +122,7 @@ def get_interpolation_1d_function(
     x: np.ndarray,
     y: np.ndarray,
     add_origo: bool,
-    kind: Union[str, int] = "cubic",
+    kind: str | int = "cubic",
 ) -> Callable[[float], Interpolated1DValue]:
     """Returns the interpolation 1d function
     add_origin: (0,0) is added as a value if add_origin is true and x[0] > 0

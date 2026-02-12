@@ -1,57 +1,43 @@
 from dataclasses import dataclass
-from typing import Union, TypeVar
+from typing import TypeVar, Union
 
 import numpy as np
+from scipy import interpolate, optimize
 
-from scipy import optimize, interpolate
-
-from ship_model_lib.ship_dimensions import (
-    ShipDimensionsHollenbachSingleScrew,
-    ShipDimensionsHollenbachTwinScrew,
-    ShipDimensionsAddedResistance,
+from ship_model_lib.added_resistance import (
+    AddedResistanceBySeaMarginCurve,
+    AddedResistanceBySNNM,
+    AddedResistanceByStaWave2,
+    AddedResistanceWindITTC,
 )
 from ship_model_lib.calm_water_resistance import (
-    CalmWaterResistanceBySpeedResistanceCurve,
     CalmWaterResistanceBySpeedPowerCurve,
+    CalmWaterResistanceBySpeedResistanceCurve,
+    CalmWaterResistanceHollenbachSingleScrewBallastDraft,
     CalmWaterResistanceHollenbachSingleScrewDesignDraft,
     CalmWaterResistanceHollenbachTwinScrewDesignDraft,
-    CalmWaterResistanceHollenbachSingleScrewBallastDraft,
+)
+from ship_model_lib.machinery import (
+    FuelByMassFraction,
+    FuelConsumption,
+    LoadInput,
+    MachineryResult,
+    MachinerySubsystemSimple,
+    MachinerySystem,
+    MachinerySystemResult,
+    PropulsionType,
 )
 from ship_model_lib.propulsor import (
-    PropulsorOperatingPoint,
     PropulsorDataBseries,
     PropulsorDataOpenWater,
     PropulsorDataScalar,
-    WakeFractionThrustDeductionFactorPoint,
+    PropulsorOperatingPoint,
     rps_to_rad_per_s,
 )
-from ship_model_lib.added_resistance import (
-    WaveSpectrumType,
-    AddedResistanceByStaWave2,
-    AddedResistanceBySeaMarginCurve,
-    AddedResistanceBySNNM,
-    AddedResistanceWindITTC,
-)
-from .operation_profile_structure import Weather, OperationPoint, Location
-from .utility import kn_to_m_per_s, m_per_s_to_kn, Interpolated1DValue
-from ship_model_lib.machinery import (
-    Point,
-    Curve,
-    EmissionType,
-    EmissionFactor,
-    FuelByMassFraction,
-    FuelConsumption,
-    PowerSourceWithEfficiency,
-    PowerSourceWithSpecificFuelConsumption,
-    MachinerySystem,
-    MachinerySubsystemSimple,
-    MachineryResult,
-    MachinerySystemResult,
-    LoadInput,
-    PropulsionType,
-)
-from .ship_types import ShipType
 
+from .operation_profile_structure import OperationPoint, Weather
+from .ship_types import ShipType
+from .utility import Interpolated1DValue, kn_to_m_per_s
 
 Numeric = TypeVar("Numeric", float, np.ndarray)
 

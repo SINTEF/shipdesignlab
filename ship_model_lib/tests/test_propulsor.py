@@ -1,20 +1,20 @@
-import pytest
 import random
-import numpy as np
-import os
+from dataclasses import fields
 
-from ship_model_lib.propulsor import PropulsorDataScalar, PropulsorDataBseries
-from ship_model_lib.ship_model import HullOperatingPoint
+import numpy as np
+import pytest
+from scipy import interpolate
 
 from ship_model_lib.propulsor import (
-    WakeFractionThrustDeductionFactorPoint,
     OpenWaterPropellerCurvePoint,
+    PropulsorDataBseries,
+    PropulsorDataOpenWater,
+    PropulsorDataScalar,
+    ReCorrection,
+    WakeFractionThrustDeductionFactorPoint,
+    kn_to_m_per_s,
 )
-
-from ship_model_lib.propulsor import PropulsorDataOpenWater, kn_to_m_per_s
-from dataclasses import fields
-from ship_model_lib.propulsor import PropulsorDataBseries, ReCorrection
-from scipy import interpolate
+from ship_model_lib.ship_model import HullOperatingPoint
 
 
 @pytest.fixture
@@ -36,12 +36,10 @@ def test_negative_thrust(propulsor_b_series: PropulsorDataBseries):
     speed_list = np.array([0, 14, 0])
     thrust_list = np.array([random.random(), -random.random(), -random.random()]) * 1000
     # Test with scalar value
-    for vessel_speed_kn, thrust_resistance_newton in zip(speed_list, thrust_list):
-        performance_data = (
-            propulsor_b_series.get_propulsor_data_from_vessel_speed_thrust(
-                vessel_speed_kn=vessel_speed_kn,
-                thrust_resistance_newton=thrust_resistance_newton,
-            )
+    for vessel_speed_kn, thrust_resistance_newton in zip(speed_list, thrust_list, strict=True):
+        performance_data = propulsor_b_series.get_propulsor_data_from_vessel_speed_thrust(
+            vessel_speed_kn=vessel_speed_kn,
+            thrust_resistance_newton=thrust_resistance_newton,
         )
         assert np.allclose(performance_data.n_rpm, 0)
         assert np.allclose(performance_data.shaft_power_kw, 0)
@@ -95,13 +93,11 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
             vessel_speed_kn=speed,
         )
         for wake_frac, thrust_ded, speed in zip(
-            wake_fraction, thrust_deduction, vessel_speed_kn
+            wake_fraction, thrust_deduction, vessel_speed_kn, strict=True
         )
     ]
 
-    j_array = np.array(
-        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
-    )
+    j_array = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])
     kt_array = (
         np.array(
             [
@@ -145,7 +141,7 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
 
     propeller_curve_points = [
         OpenWaterPropellerCurvePoint(j=j, kt=kt, kq=kq)
-        for j, kt, kq in zip(j_array, kt_array, kq_array)
+        for j, kt, kq in zip(j_array, kt_array, kq_array, strict=True)
     ]
 
     propulsor = PropulsorDataOpenWater(
@@ -157,9 +153,7 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
     #  if not os.getenv("CI"):  # Skip plotting on CI or in test context
     #     propulsor.plot_open_water_curves()
 
-    j_value = (
-        random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
-    )
+    j_value = random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
     speed_kn = random.random() * 20
     n_rps = kn_to_m_per_s(speed_kn) / (j_value * propulsor._d)
     propulsion_point = propulsor.get_propulsor_data_from_vessel_speed_rps(
@@ -169,14 +163,11 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
     )
     eff_open_water = (
-        propulsion_point.propeller_thrust_newton
-        * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
+        propulsion_point.propeller_thrust_newton * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
     ) / (propulsion_point.shaft_power_kw * 1000)
     print(propulsion_point)
     assert propulsion_point.efficiency_hull == pytest.approx(eff_hull, rel=1e-4)
-    assert propulsion_point.efficiency_open_water == pytest.approx(
-        eff_open_water, rel=1e-4
-    )
+    assert propulsion_point.efficiency_open_water == pytest.approx(eff_open_water, rel=1e-4)
 
     # Test the inverse
     propulsion_point_inv = propulsor.get_propulsor_data_from_vessel_speed_thrust(
@@ -189,7 +180,7 @@ def test_get_propulsor_data_open_water_from_vessel_speed_rps():
         )
 
 
-def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
+def test_get_propulsor_data_bseries_from_vessel_speed_rps():
 
     pitch_diameter_ratio = 0.721
     blade_area_ratio = 0.431
@@ -204,9 +195,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         [0.201, 0.205, 0.209, 0.214, 0.218, 0.22, 0.223, 0.224, 0.227, 0.229, 0.233]
     )
 
-    j_array = np.array(
-        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
-    )
+    j_array = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])
     kt_array = (
         np.array(
             [
@@ -250,7 +239,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
 
     propeller_curve_points = [
         OpenWaterPropellerCurvePoint(j=j, kt=kt, kq=kq)
-        for j, kt, kq in zip(j_array, kt_array, kq_array)
+        for j, kt, kq in zip(j_array, kt_array, kq_array, strict=True)
     ]
 
     wake_factor_thrust_deduction_points = [
@@ -260,11 +249,11 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
             vessel_speed_kn=speed,
         )
         for wake_frac, thrust_ded, speed in zip(
-            wake_fraction, thrust_deduction, vessel_speed_kn
+            wake_fraction, thrust_deduction, vessel_speed_kn, strict=True
         )
     ]
 
-    propulsor_bseries = PropulsorDataBseries(
+    PropulsorDataBseries(
         pd_pitch_diameter_ratio=pitch_diameter_ratio,
         ear_blade_area_ratio=blade_area_ratio,
         dp_diameter_propeller_m=dp_diameter_propeller_m,
@@ -274,7 +263,6 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
         re_correction=ReCorrection.ITTC78,
     )
-    # propulsor_bseries.plot_open_water_curves()
 
     propulsor = PropulsorDataOpenWater(
         propeller_curve_points=propeller_curve_points,
@@ -285,9 +273,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
     # if not os.getenv("CI"):  # Skip plotting on CI or in test context
     #   propulsor.plot_open_water_curves()
 
-    j_value = (
-        random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
-    )
+    j_value = random.random() * (propulsor._j.max() - propulsor._j.min()) + propulsor._j.min()
     speed_kn = random.random() * 20
     n_rps = kn_to_m_per_s(speed_kn) / (j_value * propulsor._d)
     propulsion_point = propulsor.get_propulsor_data_from_vessel_speed_rps(
@@ -297,14 +283,11 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
         propulsion_point.propeller_thrust_newton * propulsion_point.wake_velocity_kn
     )
     eff_open_water = (
-        propulsion_point.propeller_thrust_newton
-        * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
+        propulsion_point.propeller_thrust_newton * kn_to_m_per_s(propulsion_point.wake_velocity_kn)
     ) / (propulsion_point.shaft_power_kw * 1000)
     print(propulsion_point)
     assert propulsion_point.efficiency_hull == pytest.approx(eff_hull, rel=1e-4)
-    assert propulsion_point.efficiency_open_water == pytest.approx(
-        eff_open_water, rel=1e-4
-    )
+    assert propulsion_point.efficiency_open_water == pytest.approx(eff_open_water, rel=1e-4)
 
     # Test the inverse
     propulsion_point_inv = propulsor.get_propulsor_data_from_vessel_speed_thrust(
@@ -319,9 +302,7 @@ def test_get_propulsor_data_Bseries_from_vessel_speed_rps():
 
 def test_input_data_are_the_same_length():
     # | hide
-    data_set_vessel_speed_kn = np.array(
-        [13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18]
-    )
+    data_set_vessel_speed_kn = np.array([13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18])
     data_set_wake_factor = np.array(
         [0.338, 0.337, 0.336, 0.335, 0.334, 0.332, 0.329, 0.328, 0.326, 0.325, 0.322]
     )
@@ -404,7 +385,7 @@ def test_input_data_are_the_same_length():
     # | hide
     propeller_curve_points = [
         OpenWaterPropellerCurvePoint(j=j, kt=kt, kq=kq)
-        for j, kt, kq in zip(data_set_j, data_set_kt, data_set_kq)
+        for j, kt, kq in zip(data_set_j, data_set_kt, data_set_kq, strict=True)
     ]
     wake_factor_thrust_deduction_points = [
         WakeFractionThrustDeductionFactorPoint(
@@ -412,7 +393,7 @@ def test_input_data_are_the_same_length():
             wake_fraction_factor=wake_factor,
             thrust_deduction_factor=thrust_reduction,
         )
-        for vessel_speed_kn, wake_factor, thrust_reduction in zip(
+        for vessel_speed_kn, wake_factor, thrust_reduction in zip(  # noqa: B905
             data_set_vessel_speed_kn, data_set_wake_factor, data_set_thrust_reduction
         )
     ]
@@ -423,22 +404,14 @@ def test_input_data_are_the_same_length():
         wake_thrust_reduction=wake_factor_thrust_deduction_points,
     )
     rtol = 0.075
-    interpolate_wake_factor = interpolate.PchipInterpolator(
-        data_set_vessel_speed_kn, data_set_wake_factor
-    )
-    interpolate_thrust_reduction = interpolate.PchipInterpolator(
-        data_set_vessel_speed_kn, data_set_thrust_reduction
-    )
-    data_set_propeller_performance = (
-        data_set_propeller.get_propulsor_data_from_vessel_speed_thrust(
-            vessel_speed_kn=data_set_vessel_speed_kn,
-            thrust_resistance_newton=data_set_total_resistance_kilo_newton * 1000,
-        )
+    interpolate.PchipInterpolator(data_set_vessel_speed_kn, data_set_wake_factor)
+    interpolate.PchipInterpolator(data_set_vessel_speed_kn, data_set_thrust_reduction)
+    data_set_propeller_performance = data_set_propeller.get_propulsor_data_from_vessel_speed_thrust(
+        vessel_speed_kn=data_set_vessel_speed_kn,
+        thrust_resistance_newton=data_set_total_resistance_kilo_newton * 1000,
     )
 
-    assert np.allclose(
-        data_set_propeller_performance.n_rpm / data_set_n_rpm, 1, rtol=rtol
-    ), (
+    assert np.allclose(data_set_propeller_performance.n_rpm / data_set_n_rpm, 1, rtol=rtol), (
         f"Propeller data {data_set_propeller_performance.n_rpm}, "
         f"Calculated propeller rpm {data_set_propeller_performance.n_rpm} "
         f"is not equal to the expected {data_set_n_rpm} rpm"
@@ -462,24 +435,24 @@ def test_input_data_are_the_same_length():
     )
     # | hide
     # Check the input data are of the same length
-    assert len(data_set_vessel_speed_kn) == len(
-        data_set_wake_factor
-    ), f"Length {len(data_set_wake_factor)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
-    assert len(data_set_vessel_speed_kn) == len(
-        data_set_thrust_reduction
-    ), f"Length {len(data_set_thrust_reduction)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
-    assert len(data_set_vessel_speed_kn) == len(
-        data_set_total_resistance_kilo_newton
-    ), f"Length {len(data_set_total_resistance_kilo_newton)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
-    assert len(data_set_j) == len(
-        data_set_kt
-    ), f"Length {len(data_set_kt)} is not equal to what is expected {len(data_set_j)}"
-    assert len(data_set_j) == len(
-        data_set_kq
-    ), f"Length {len(data_set_kq)} is not equal what is expected {len(data_set_j)}"
-    assert len(data_set_vessel_speed_kn) == len(
-        data_set_n_rpm
-    ), f"Length {len(data_set_n_rpm)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
-    assert len(data_set_vessel_speed_kn) == len(
-        data_set_power_kw
-    ), f"Length {len(data_set_power_kw)} is not equal what is expected {len(data_set_vessel_speed_kn)}"
+    assert len(data_set_vessel_speed_kn) == len(data_set_wake_factor), (
+        f"Length {len(data_set_wake_factor)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
+    )
+    assert len(data_set_vessel_speed_kn) == len(data_set_thrust_reduction), (
+        f"Length {len(data_set_thrust_reduction)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
+    )
+    assert len(data_set_vessel_speed_kn) == len(data_set_total_resistance_kilo_newton), (
+        f"Length {len(data_set_total_resistance_kilo_newton)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
+    )
+    assert len(data_set_j) == len(data_set_kt), (
+        f"Length {len(data_set_kt)} is not equal to what is expected {len(data_set_j)}"
+    )
+    assert len(data_set_j) == len(data_set_kq), (
+        f"Length {len(data_set_kq)} is not equal what is expected {len(data_set_j)}"
+    )
+    assert len(data_set_vessel_speed_kn) == len(data_set_n_rpm), (
+        f"Length {len(data_set_n_rpm)} is not equal to what is expected {len(data_set_vessel_speed_kn)}"
+    )
+    assert len(data_set_vessel_speed_kn) == len(data_set_power_kw), (
+        f"Length {len(data_set_power_kw)} is not equal what is expected {len(data_set_vessel_speed_kn)}"
+    )

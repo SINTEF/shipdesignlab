@@ -1,13 +1,15 @@
-from abc import ABC
-from typing import Callable, Union, TypeVar
-from functools import cached_property
-from scipy.optimize import brentq
-from dataclasses import dataclass
 import logging
+from abc import ABC
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import cached_property
+from typing import TypeVar
 
 import numpy as np
-from .utility import get_interpolation_1d_function, Interpolated1DValue
+from scipy.optimize import brentq
+
 from .ship_types import ResistanceLevel
+from .utility import Interpolated1DValue, get_interpolation_1d_function
 
 # Define logger
 logger = logging.getLogger(__name__)
@@ -36,7 +38,7 @@ class CalmWaterResistanceBase(ABC):
 
     @cached_property
     def _speed_to_y_interpolation_function(
-        self, kind: Union[str, int] = "cubic"
+        self, kind: str | int = "cubic"
     ) -> Callable[[Numeric], Interpolated1DValue]:
         """Returns a interpolation function for  propulsion speed in waves in respect to a given
         power
@@ -52,7 +54,7 @@ class CalmWaterResistanceBase(ABC):
 
     @cached_property
     def _y_to_speed_interpolation_function(
-        self, kind: Union[str, int] = "cubic"
+        self, kind: str | int = "cubic"
     ) -> Callable[[Numeric], Interpolated1DValue]:
         """Return an interpolation function for propulsion power in waves in respect to a given
         speed
@@ -175,18 +177,16 @@ class CalmWaterResistanceBySpeedResistanceCurve(CalmWaterResistanceBase):
         return self._y_to_speed_interpolation_function(resistance_k_n)
 
 
-from typing import Optional
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Union
-from enum import Enum
+
+import numpy as np
+from scipy.optimize import root_scalar
 
 # from mes_util.constants import KINEMATIC_VISCOSITY_WATER
 from ship_model_lib.ship_dimensions import (
     ShipDimensionsHollenbachSingleScrew,
     ShipDimensionsHollenbachTwinScrew,
 )
-import numpy as np
-from scipy.optimize import root_scalar
 
 GRAVITY = 9.81
 KINEMATIC_VISCOSITY_WATER = 1.189e-6
@@ -258,7 +258,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
     @property
     def wetted_surface_area(self) -> float:
         """Wetted surface area approximation by Hollenbach
-        $ S = k L_{PP} \left(B + 2T\right) $
+        $ S = k L_{PP} \\left(B + 2T\right) $
         Hollenbach, K. (1997a). Beitrag zur Abschatzung von Widerstand und Propulsion von Ein- und
         Zweischraubenschiffen im Vorentwurf. PhD thesis, Institut fur Schiffbau, Universitat Hamburg,
         Hamburg, Germany.
@@ -354,10 +354,10 @@ class CalmWaterResistanceHollenbachBase(ABC):
 
         A formula developed at the Schiffbautechnische Versuchsanstalt Wien (Vienna Model Basin) is used for the correlation allowance.
 
-        $$C_A = \left{\begin{array}
-            \left(0.35 - 0.002 L_{PP} \right)10^{-3} \\
+        $$C_A = \\left{\begin{array}
+            \\left(0.35 - 0.002 L_{PP} \right)10^{-3} \\
             0
-        \end{array}$$
+        \\end{array}$$
         """
         if self.l_length_between_perpendiculars < 175:
             return (0.35 - 0.002 * self.l_length_between_perpendiculars) * 1e-3
@@ -518,7 +518,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         self,
         velocity_kn: Numeric,
         resistance_level: ResistanceLevel = ResistanceLevel.MEAN,
-        form_factor: Optional[float] = None,
+        form_factor: float | None = None,
     ) -> Numeric:
         """
         Calculates the total resistance for a given speed or array of speeds
@@ -556,7 +556,7 @@ class CalmWaterResistanceHollenbachBase(ABC):
         self,
         resistance_k_n: float,
         resistance_level: ResistanceLevel = ResistanceLevel.MEAN,
-        form_factor: Optional[float] = None,
+        form_factor: float | None = None,
     ) -> Numeric:
         """
         Calculates the speed for a given resistance force in k_n

@@ -1,13 +1,12 @@
+from dataclasses import dataclass
+
 from ship_model_lib.calm_water_resistance import (
     CalmWaterResistanceHollenbachSingleScrewDesignDraft,
 )
-
 from ship_model_lib.ship_dimensions import (
-    ShipDimensionsHollenbachSingleScrew,
     ShipDimensionsAddedResistance,
+    ShipDimensionsHollenbachSingleScrew,
 )
-
-from dataclasses import dataclass
 
 
 def test_ship_dimension_test():

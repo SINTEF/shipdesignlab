@@ -1,19 +1,21 @@
+import os
+import random
+from typing import TypeVar
+
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 from ship_model_lib.calm_water_resistance import (
     CalmWaterResistanceBySpeedPowerCurve,
     CalmWaterResistanceBySpeedResistanceCurve,
-    ShipDimensionsHollenbachTwinScrew,
-    ShipDimensionsHollenbachSingleScrew,
     CalmWaterResistanceHollenbachSingleScrewDesignDraft,
     CalmWaterResistanceHollenbachTwinScrewDesignDraft,
     ResistanceLevel,
+    ShipDimensionsHollenbachSingleScrew,
+    ShipDimensionsHollenbachTwinScrew,
 )
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
-import numpy as np
-import pandas as pd
-import os
-import random
-from typing import Callable, Union, TypeVar
 
 
 def test_calm_water_resistance_by_speed_resistance_curve():
@@ -21,25 +23,19 @@ def test_calm_water_resistance_by_speed_resistance_curve():
     power_kw = np.power(speed_kn, 3) * 5
 
     fig = make_subplots()
-    fig.add_trace(
-        go.Scatter(x=speed_kn, y=power_kw, mode="markers", name="Points given")
-    )
+    fig.add_trace(go.Scatter(x=speed_kn, y=power_kw, mode="markers", name="Points given"))
 
     resistance_model = CalmWaterResistanceBySpeedPowerCurve(
         speed_ref_kn=speed_kn, power_ref_kw=power_kw
     )
     speed_new = np.linspace(0, speed_kn.max(), 100)
     power_estimated = resistance_model.get_power_from_speed(speed_kn=speed_new)
-    fig.add_trace(
-        go.Scatter(x=speed_new, y=power_estimated.value, name="Power Estimated")
-    )
+    fig.add_trace(go.Scatter(x=speed_new, y=power_estimated.value, name="Power Estimated"))
     power_new = np.linspace(0, power_kw.max(), 100)
     speed_estimated = resistance_model.get_speed_from_power(power_kw=power_new)
-    fig.add_trace(
-        go.Scatter(x=speed_estimated.value, y=power_new, name="Speed Estimated")
-    )
+    fig.add_trace(go.Scatter(x=speed_estimated.value, y=power_new, name="Speed Estimated"))
     fig.update_layout(title="Speed vs Power")
-    fig.show(renderer="svg")
+    fig.show(renderer="browser")
 
     file_path = os.path.join(
         os.path.dirname(__file__),
@@ -55,34 +51,24 @@ def test_calm_water_resistance_by_speed_resistance_curve():
     resistance_k_n = np.power(speed_kn, 2) * 3
 
     fig = make_subplots()
-    fig.add_trace(
-        go.Scatter(x=speed_kn, y=resistance_k_n, mode="markers", name="Points given")
-    )
+    fig.add_trace(go.Scatter(x=speed_kn, y=resistance_k_n, mode="markers", name="Points given"))
 
     resistance_model = CalmWaterResistanceBySpeedResistanceCurve(
         speed_ref_kn=speed_kn, resistance_ref_k_n=resistance_k_n
     )
     speed_new = np.linspace(0, speed_kn.max(), 100)
-    resistance_estimated = resistance_model.get_resistance_from_speed(
-        velocity_kn=speed_new
-    )
+    resistance_estimated = resistance_model.get_resistance_from_speed(velocity_kn=speed_new)
     fig.add_trace(
-        go.Scatter(
-            x=speed_new, y=resistance_estimated.value, name="Resistance Estimated"
-        )
+        go.Scatter(x=speed_new, y=resistance_estimated.value, name="Resistance Estimated")
     )
     resistance_new = np.linspace(0, resistance_k_n.max(), 100)
-    speed_estimated = resistance_model.get_speed_from_resistance(
-        resistance_k_n=resistance_new
-    )
-    fig.add_trace(
-        go.Scatter(x=speed_estimated.value, y=resistance_new, name="Speed Estimated")
-    )
+    speed_estimated = resistance_model.get_speed_from_resistance(resistance_k_n=resistance_new)
+    fig.add_trace(go.Scatter(x=speed_estimated.value, y=resistance_new, name="Speed Estimated"))
     fig.update_layout(title="Speed vs Resistance Force")
-    fig.show(renderer="svg")
+    fig.show(renderer="browser")
 
 
-def test_the_code_for_Hollenbach_method():
+def test_the_code_for_hollenbach_method():
     pd.options.plotting.backend = "plotly"
 
     # Main dimensions
@@ -92,11 +78,6 @@ def test_the_code_for_Hollenbach_method():
     b_beam = 24
     t_draft = 8.2
     v_displacement = 18872.0
-    s_wetted_surface_area = 4400
-    a_bt = 14
-    s_app = 52
-    c_p = 0.6783
-    v_s = 17.5
     dp = 4.9
 
     l_wl = l_pp + l_aft
@@ -141,29 +122,23 @@ def test_the_code_for_Hollenbach_method():
     df_to_plot = pd.DataFrame(index=speed_kn)
     df_to_plot["resistance_min"] = resistance_force_k_n_minimum
     df_to_plot["resistance_mean"] = resistance_force_k_n_mean
-    df_to_plot["resistance_mean_form_factor"] = (
-        resistance_force_k_n_mean_with_form_factor
-    )
+    df_to_plot["resistance_mean_form_factor"] = resistance_force_k_n_mean_with_form_factor
     df_to_plot["resistance_max"] = resistance_force_k_n_maximum
-    fig: Figure = df_to_plot.plot()
+    fig = df_to_plot.plot()
     fig.update_xaxes(title="Speed [kn]")
     fig.update_yaxes(title="Resistance [kN]")
 
     speed_kn_ref = random.random() * 19
     resistance_k_n_ref = ship_model.get_resistance_from_speed(speed_kn_ref)
-    speed_kn_estimated = ship_model.get_speed_from_resistance(
-        resistance_k_n=resistance_k_n_ref
-    )
+    speed_kn_estimated = ship_model.get_speed_from_resistance(resistance_k_n=resistance_k_n_ref)
     fig.add_trace(
-        go.Scatter(
-            x=[speed_kn_estimated], y=[resistance_k_n_ref], name="Resistance to speed"
-        )
+        go.Scatter(x=[speed_kn_estimated], y=[resistance_k_n_ref], name="Resistance to speed")
     )
-    fig.show(renderer="svg")
+    fig.show(renderer="browser")
 
-    assert np.isclose(
-        speed_kn_ref, speed_kn_estimated
-    ), f"The estimated speed - {speed_kn_estimated} - is not equal to the answer - {speed_kn_ref}."
+    assert np.isclose(speed_kn_ref, speed_kn_estimated), (
+        f"The estimated speed - {speed_kn_estimated} - is not equal to the answer - {speed_kn_ref}."
+    )
 
     file_path = os.path.join(
         os.path.dirname(__file__),
@@ -198,13 +173,8 @@ def test_the_code_for_Hollenbach_method():
     df_output["c_r_bt"] = ship_model._get_c_r_bt(fn_vec)
     df_output["c_r"] = ship_model._get_c_r(fn_vec)
 
-    overwrite_df_output = False
-    if overwrite_df_output:
-        df_output.to_csv(path_to_ref_data)
     for col_name in df_output:
-        assert np.all(
-            np.isclose(df_output_ref[col_name].values, df_output[col_name].values)
-        )
+        assert np.all(np.isclose(df_output_ref[col_name].values, df_output[col_name].values))
 
     # Resistance estimation
     assert np.isclose(ship_model._c_a, 0.06e-3)
@@ -222,9 +192,7 @@ def test_the_code_for_Hollenbach_method():
     df_output_coeff = pd.DataFrame()
     df_output_coeff["vs"] = df_output_ref.vs.values
     df_output_coeff["fn"] = fn_vec
-    df_output_coeff["re"] = ship_model.get_reynolds_number(
-        kn_to_m_per_s(df_output.vs.values)
-    )
+    df_output_coeff["re"] = ship_model.get_reynolds_number(kn_to_m_per_s(df_output.vs.values))
     df_output_coeff["c_r_min"] = ship_model._get_c_r_min(fn_vec)
     df_output_coeff["c_r"] = ship_model._get_c_r(fn_vec)
     df_output_coeff["c_f"] = ship_model._get_c_f(kn_to_m_per_s(df_output.vs.values))
@@ -243,17 +211,10 @@ def test_the_code_for_Hollenbach_method():
         + ship_model._c_aas
         + ship_model._c_a
     )
-    df_output_coeff["c_t_max"] = (
-        df_output_coeff.c_t * ship_model._factor_for_max_resistance
-    )
-    overwrite_df_output_coeff = False
-    if overwrite_df_output_coeff:
-        df_output_coeff.to_csv(path_to_ref_data)
+    df_output_coeff["c_t_max"] = df_output_coeff.c_t * ship_model._factor_for_max_resistance
     for col_name in df_output_coeff:
         assert np.all(
-            np.isclose(
-                df_output_coeff_ref[col_name].values, df_output_coeff[col_name].values
-            )
+            np.isclose(df_output_coeff_ref[col_name].values, df_output_coeff[col_name].values)
         )
 
     file_path = os.path.join(
@@ -268,21 +229,10 @@ def test_the_code_for_Hollenbach_method():
     df_output_resistance = pd.DataFrame()
     df_output_resistance["vs"] = df_output_ref.vs.values
     df_output_resistance["fn"] = fn_vec
-    df_output_resistance["re"] = ship_model.get_reynolds_number(
-        kn_to_m_per_s(df_output.vs.values)
-    )
-    df_output_resistance["r_t_min"] = ship_model._get_total_resistance_min(
-        df_output.vs.values
-    )
-    df_output_resistance["r_t"] = ship_model._get_total_resistance_mean(
-        df_output.vs.values
-    )
-    df_output_resistance["r_t_max"] = ship_model._get_total_resistance_max(
-        df_output.vs.values
-    )
-    overwrite_df_output_resistance = False
-    if overwrite_df_output_resistance:
-        df_output_resistance.to_csv(path_to_ref_data)
+    df_output_resistance["re"] = ship_model.get_reynolds_number(kn_to_m_per_s(df_output.vs.values))
+    df_output_resistance["r_t_min"] = ship_model._get_total_resistance_min(df_output.vs.values)
+    df_output_resistance["r_t"] = ship_model._get_total_resistance_mean(df_output.vs.values)
+    df_output_resistance["r_t_max"] = ship_model._get_total_resistance_max(df_output.vs.values)
     for col_name in df_output_resistance:
         assert np.all(
             np.isclose(
@@ -290,9 +240,7 @@ def test_the_code_for_Hollenbach_method():
                 df_output_resistance[col_name].values,
             )
         )
-    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show(
-        renderer="svg"
-    )
+    df_output_resistance.plot(x="vs", y=["r_t_min", "r_t", "r_t_max"]).show(renderer="browser")
 
     ship_dimensions_twin_screw = ShipDimensionsHollenbachTwinScrew(
         b_beam_m=b_beam,
@@ -329,4 +277,4 @@ def test_the_code_for_Hollenbach_method():
     fig = df_output.plot()
     fig.update_xaxes(title="Speed [kn]")
     fig.update_yaxes(title="Resistance [kN]")
-    fig.show(renderer="svg")
+    fig.show(renderer="browser")

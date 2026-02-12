@@ -1,24 +1,25 @@
 from random import random
-import numpy as np
-from typing import Union, Optional, Dict, Any
-from ship_model_lib.operation_profile_structure import Weather, OperationPoint, Location
 
-Numeric = Union[float, np.ndarray]
+import numpy as np
+
+from ship_model_lib.operation_profile_structure import Location, OperationPoint, Weather
+
+Numeric = float | np.ndarray
 
 
 def test_operation_profile_structure():
 
-    data = dict(
-        significant_wave_height_m=random(),
-        mean_wave_period_s=random(),
-        wave_direction_deg=random(),
-        wind_direction_deg=random(),
-        wind_speed_m_per_s=random(),
-        ocean_current_direction_deg=random(),
-        ocean_current_speed_m_per_s=random(),
-        sea_water_temperature_deg_c=random(),
-        air_temperature_deg_c=random(),
-    )
+    data = {
+        "significant_wave_height_m": random(),
+        "mean_wave_period_s": random(),
+        "wave_direction_deg": random(),
+        "wind_direction_deg": random(),
+        "wind_speed_m_per_s": random(),
+        "ocean_current_direction_deg": random(),
+        "ocean_current_speed_m_per_s": random(),
+        "sea_water_temperature_deg_c": random(),
+        "air_temperature_deg_c": random(),
+    }
 
     weather = Weather(**data)
     for key, value in data.items():

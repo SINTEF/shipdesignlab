@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import Optional, Union, Callable, List, TypeVar, NamedTuple
+from typing import NamedTuple, TypeVar
+
 import numpy as np
-from plotly.subplots import make_subplots
 from plotly.graph_objs import Figure as PlotlyFigure
-from .utility import get_interpolation_1d_function, Interpolated1DValue
-from .ship_types import PropulsionType, EmissionType
+from plotly.subplots import make_subplots
+
+from .ship_types import EmissionType, PropulsionType
+from .utility import Interpolated1DValue, get_interpolation_1d_function
 
 Numeric = TypeVar("Numeric", np.ndarray, float)
 
@@ -19,7 +22,7 @@ class Point:
 
 @dataclass
 class Curve:
-    points: List[Point] = field(default_factory=list)
+    points: list[Point] = field(default_factory=list)
 
     def add_point(self, point: Point):
         self.points.append(point)
@@ -33,8 +36,8 @@ class Curve:
     def get_curve_plot(
         self,
         name: str = "",
-        y_label: Optional[str] = None,
-        x_label: Optional[str] = None,
+        y_label: str | None = None,
+        x_label: str | None = None,
     ) -> PlotlyFigure:
         fig = make_subplots()
         fig.add_scatter(x=self.to_x_array(), y=self.to_y_array(), name=name)
@@ -129,18 +132,14 @@ class FuelConsumption:
     marine_gas_oil: float = 0.0
     methanol: float = 0.0
 
-    def __init__(
-        self, total_fuel_consumption: float, fuel_by_mass_fraction: FuelByMassFraction
-    ):
+    def __init__(self, total_fuel_consumption: float, fuel_by_mass_fraction: FuelByMassFraction):
         self.diesel = fuel_by_mass_fraction.diesel * total_fuel_consumption
         self.hfo = fuel_by_mass_fraction.hfo * total_fuel_consumption
         self.natural_gas = fuel_by_mass_fraction.natural_gas * total_fuel_consumption
         self.hydrogen = fuel_by_mass_fraction.hydrogen * total_fuel_consumption
         self.ammonia = fuel_by_mass_fraction.ammonia * total_fuel_consumption
         self.lpg = fuel_by_mass_fraction.lpg * total_fuel_consumption
-        self.marine_gas_oil = (
-            fuel_by_mass_fraction.marine_gas_oil * total_fuel_consumption
-        )
+        self.marine_gas_oil = fuel_by_mass_fraction.marine_gas_oil * total_fuel_consumption
         self.methanol = fuel_by_mass_fraction.methanol * total_fuel_consumption
 
     def __add__(self, other):
@@ -149,10 +148,8 @@ class FuelConsumption:
             total_fuel_consumption=0,
             fuel_by_mass_fraction=FuelByMassFraction(diesel=1.0),
         )
-        for fuel in self.__dict__.keys():
-            sum_fuel.__setattr__(
-                fuel, self.__getattribute__(fuel) + other.__getattribute__(fuel)
-            )
+        for fuel in self.__dict__:
+            sum_fuel.__setattr__(fuel, self.__getattribute__(fuel) + other.__getattribute__(fuel))
         return sum_fuel
 
     @property
@@ -189,7 +186,7 @@ class Emissions:
 @dataclass
 class EmissionFactor:
     rated_power_kw: float
-    factor: Union[Curve, float]
+    factor: Curve | float
     emission_type: EmissionType
 
     @property
@@ -208,7 +205,7 @@ class EmissionFactor:
             return self.factor * power_kw / 1000
         return self.interpolate_factor(power_normalized).value * power_kw / 1000
 
-    def get_emission_plot(self) -> Optional[PlotlyFigure]:
+    def get_emission_plot(self) -> PlotlyFigure | None:
         """Returns a plot of the emission factor. Returns None if the emission factor is a scalar"""
         if self.has_scalar_factor:
             return None
@@ -263,19 +260,19 @@ class MachinerySystemResult(NamedTuple):
     """Result of machinery system calculation for fuel consumption and emissions"""
 
     total: MachineryResult
-    mechanical_system: Optional[MachineryResult] = None
-    electric_system: Optional[MachineryResult] = None
+    mechanical_system: MachineryResult | None = None
+    electric_system: MachineryResult | None = None
 
 
 @dataclass(kw_only=True)
 class PowerSource(ABC):
     fuel: FuelByMassFraction
     rated_power_kw: float
-    emission_factors: List[EmissionFactor] = field(default_factory=list)
+    emission_factors: list[EmissionFactor] = field(default_factory=list)
 
     @abstractmethod
     def get_specific_fuel_consumption_g_per_kwh(
-        self, power_out_kw: Optional[Numeric] = None
+        self, power_out_kw: Numeric | None = None
     ) -> Numeric:
         pass
 
@@ -317,11 +314,11 @@ class PowerSourceWithEfficiency(PowerSource):
     normalized to the rated power of the power source, and y is the efficiency.
     """
 
-    efficiency: Union[float, Curve]
+    efficiency: float | Curve
 
     @property
     def _has_scalar_efficiency(self):
-        return isinstance(self.efficiency, float) or isinstance(self.efficiency, int)
+        return isinstance(self.efficiency, (float, int))
 
     @cached_property
     def _engine_efficiency_curve_interpolator(self):
@@ -329,9 +326,7 @@ class PowerSourceWithEfficiency(PowerSource):
         Interpolates the engine efficiency based on output load-efficiency curve in a specific load.
         This is independent of the engine speed.
         """
-        assert (
-            not self._has_scalar_efficiency
-        ), "Engine efficiency is a scalar, not a curve."
+        assert not self._has_scalar_efficiency, "Engine efficiency is a scalar, not a curve."
         return get_interpolation_1d_function(
             x=self.efficiency.to_x_array(),
             y=self.efficiency.to_y_array(),
@@ -339,7 +334,7 @@ class PowerSourceWithEfficiency(PowerSource):
         )
 
     def get_specific_fuel_consumption_g_per_kwh(
-        self, power_out_kw: Optional[Numeric] = None
+        self, power_out_kw: Numeric | None = None
     ) -> Numeric:
         """
         Returns the specific fuel consumption of engine (g/kw.h)
@@ -348,9 +343,7 @@ class PowerSourceWithEfficiency(PowerSource):
             return 1 / self.efficiency / self.fuel.lhv_mj_per_kg * 3600
         else:
             shaft_power_normalized = power_out_kw / self.rated_power_kw
-            efficiency = self._engine_efficiency_curve_interpolator(
-                shaft_power_normalized
-            ).value
+            efficiency = self._engine_efficiency_curve_interpolator(shaft_power_normalized).value
             return 1 / efficiency / self.fuel.lhv_mj_per_kg * 3600
 
 
@@ -363,13 +356,11 @@ class PowerSourceWithSpecificFuelConsumption(PowerSource):
     by the rated power.
     """
 
-    specific_fuel_consumption: Union[float, Curve]
+    specific_fuel_consumption: float | Curve
 
     @property
     def _has_scalar_specific_fuel_consumption(self):
-        return isinstance(self.specific_fuel_consumption, float) or isinstance(
-            self.specific_fuel_consumption, int
-        )
+        return isinstance(self.specific_fuel_consumption, (float, int))
 
     @cached_property
     def _specific_fuel_consumption_curve_interpolator(self):
@@ -377,9 +368,9 @@ class PowerSourceWithSpecificFuelConsumption(PowerSource):
         Interpolates the specific fuel consumption based on input load-specific fuel consumption
         curve in a specific load. This is independent of the engine speed.
         """
-        assert (
-            not self._has_scalar_specific_fuel_consumption
-        ), "Specific fuel consumption is a scalar, not a curve."
+        assert not self._has_scalar_specific_fuel_consumption, (
+            "Specific fuel consumption is a scalar, not a curve."
+        )
         return get_interpolation_1d_function(
             x=self.specific_fuel_consumption.to_x_array(),
             y=self.specific_fuel_consumption.to_y_array(),
@@ -387,7 +378,7 @@ class PowerSourceWithSpecificFuelConsumption(PowerSource):
         )
 
     def get_specific_fuel_consumption_g_per_kwh(
-        self, power_out_kw: Optional[Numeric] = None
+        self, power_out_kw: Numeric | None = None
     ) -> Numeric:
         """
         Returns the specific fuel consumption of engine (g/kwh)
@@ -396,9 +387,7 @@ class PowerSourceWithSpecificFuelConsumption(PowerSource):
             return self.specific_fuel_consumption
         else:
             shaft_power_normalized = power_out_kw / self.rated_power_kw
-            return self._specific_fuel_consumption_curve_interpolator(
-                shaft_power_normalized
-            ).value
+            return self._specific_fuel_consumption_curve_interpolator(shaft_power_normalized).value
 
 
 @dataclass
@@ -410,20 +399,18 @@ class PowerLoad:
     efficiency (0~1). When the efficiency is a curve, rated power should be defined.
     """
 
-    efficiency: Union[float, Curve]
-    rated_power_kw: Optional[float] = None
+    efficiency: float | Curve
+    rated_power_kw: float | None = None
 
     def __post_init__(self):
         """Check if the efficiency is a scalar or a curve"""
         if not self._has_scalar_efficiency and self.rated_power_kw is None:
-            raise ValueError(
-                "Rated power should be defined when efficiency is a curve."
-            )
+            raise ValueError("Rated power should be defined when efficiency is a curve.")
 
     @property
     def _has_scalar_efficiency(self):
         """Check if the efficiency is a scalar or a curve"""
-        return isinstance(self.efficiency, float) or isinstance(self.efficiency, int)
+        return isinstance(self.efficiency, (float, int))
 
     @cached_property
     def _efficiency_curve_interpolator(self):
@@ -443,9 +430,7 @@ class PowerLoad:
         if self._has_scalar_efficiency:
             return self.efficiency
         else:
-            return self._efficiency_curve_interpolator(
-                power_out_kw / self.rated_power_kw
-            ).value
+            return self._efficiency_curve_interpolator(power_out_kw / self.rated_power_kw).value
 
     def get_power_in_kw(self, power_out_kw: Numeric) -> Numeric:
         """Returns the power input to the load from power output"""
@@ -465,9 +450,7 @@ class MachinerySubsystemSimple:
     power consumption at the switchboard or a main shaft.
     """
 
-    power_source: Union[
-        PowerSourceWithEfficiency, PowerSourceWithSpecificFuelConsumption
-    ]
+    power_source: PowerSourceWithEfficiency | PowerSourceWithSpecificFuelConsumption
     propulsion_load: PowerLoad = None
     auxiliary_load: PowerLoad = None
 
@@ -483,9 +466,7 @@ class MachinerySubsystemSimple:
             if self.auxiliary_load is not None
             else 0
         )
-        total_power_on_power_source = (
-            propulsion_load_on_power_source + aux_load_on_power_source
-        )
+        total_power_on_power_source = propulsion_load_on_power_source + aux_load_on_power_source
         return self.power_source.get_machinery_result(total_power_on_power_source)
 
 
@@ -505,22 +486,16 @@ class MachinerySystem:
     electric_system: MachinerySubsystemSimple = None
 
     def __post_init__(self):
-        if (
-            self.propulsion_type == PropulsionType.MECHANICAL
-            and self.mechanical_system is None
-        ):
+        if self.propulsion_type == PropulsionType.MECHANICAL and self.mechanical_system is None:
             raise ValueError(
-                "Mechanical system should be defined when propulsion type is "
-                "mechanical."
+                "Mechanical system should be defined when propulsion type is mechanical."
             )
         if (
             self.propulsion_type == PropulsionType.ELECTRIC
             and self.electric_system is None
             and self.mechanical_system is not None
         ):
-            raise ValueError(
-                "Electric system should be defined when propulsion type is " "electric."
-            )
+            raise ValueError("Electric system should be defined when propulsion type is electric.")
 
     @property
     def has_mechanical_system(self):
@@ -532,8 +507,8 @@ class MachinerySystem:
 
     def get_machinery_result(
         self,
-        mechanical_load: Optional[LoadInput] = None,
-        electric_load: Optional[LoadInput] = None,
+        mechanical_load: LoadInput | None = None,
+        electric_load: LoadInput | None = None,
     ) -> MachinerySystemResult:
         """Returns the machinery result which contains fuel consumption and power consumption at
         the power source for each subsystem and total.
@@ -547,9 +522,7 @@ class MachinerySystem:
         if mechanical_load is not None and not self.has_mechanical_system:
             raise TypeError("Mechanical system is not defined")
         if electric_load is not None and not self.has_electric_system:
-            raise TypeError(
-                "Electric system is not defined but electric load is given."
-            )
+            raise TypeError("Electric system is not defined but electric load is given.")
         if (
             self.propulsion_type == PropulsionType.MECHANICAL
             and electric_load is not None
@@ -570,9 +543,7 @@ class MachinerySystem:
                 "Mechanical consumer power must be provided if the machinery system "
                 "has a mechanical system."
             )
-            result_mechanical = self.mechanical_system.get_machinery_result(
-                mechanical_load
-            )
+            result_mechanical = self.mechanical_system.get_machinery_result(mechanical_load)
 
         # Calculate fuel consumption for electric system
         if self.has_electric_system:
