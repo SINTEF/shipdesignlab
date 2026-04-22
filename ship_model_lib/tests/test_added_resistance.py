@@ -1,36 +1,36 @@
 import os
 import random
 import time
-from typing import List
 
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import pytest
-from operation_profile_lib.operation_profile_structure import Weather
 from pandas.errors import EmptyDataError
+from plotly.subplots import make_subplots
+from scipy.integrate import quad
+from scipy.special import gamma
 from tqdm import tqdm
 
 from ship_model_lib.added_resistance import (
-    ShipDimensionsAddedResistance,
-    AddedResistanceByStaWave2,
-    AddedResistanceBySNNM,
-    WaveSpectrumType,
     GRAVITY,
-    get_wave_frequency,
+    AddedResistanceBySNNM,
+    AddedResistanceByStaWave2,
     AddedResistanceWindITTC,
+    JONSWAPSpectrumITTC1984,
+    PiersonMoskowitzSpectrumITTC1978,
+    ShipDimensionsAddedResistance,
+    WaveSpectrumType,
+    get_wave_frequency,
 )
+from ship_model_lib.operation_profile_structure import Weather
 from ship_model_lib.propulsor import (
     OpenWaterPropellerCurvePoint,
     PropulsorDataOpenWater,
     WakeFractionThrustDeductionFactorPoint,
 )
-from ship_model_lib.types import ShipType
-from ship_model_lib.utility import (
-    m_per_s_to_kn,
-    get_speed_kn_from_froude_number,
-    kn_to_m_per_s,
-)
-from plotly.subplots import make_subplots
+from ship_model_lib.ship_types import ShipType
+from ship_model_lib.utility import get_speed_kn_from_froude_number, kn_to_m_per_s, m_per_s_to_kn
 
 pd.options.plotting.backend = "plotly"
 
@@ -73,9 +73,7 @@ def s_cb84_ship_dimension() -> ShipDimensionsAddedResistance:
 @pytest.fixture
 def reference_data_snnm_fn_0_1() -> pd.DataFrame:
     path_dir = os.path.dirname(os.path.abspath(__file__))
-    path_to_ref_data = os.path.join(
-        path_dir, "reference_data_for_added_resistance_snnm.csv"
-    )
+    path_to_ref_data = os.path.join(path_dir, "reference_data_for_added_resistance_snnm.csv")
     try:
         df = pd.read_csv(path_to_ref_data, index_col=0)
     except EmptyDataError:
@@ -179,23 +177,17 @@ def test_added_resistance_for_stawave2(ship_dimension: ShipDimensionsAddedResist
     # Test with heading / without / > 45 deg
     resistance_newton = added_resistance.get_added_resistance_newton(
         vessel_speed_kn=speed_kn,
-        weather=Weather(
-            significant_wave_height_m=3, wave_direction_deg=0, mean_wave_period_s=10
-        ),
+        weather=Weather(significant_wave_height_m=3, wave_direction_deg=0, mean_wave_period_s=10),
     )[0]
 
     resistance_newton_heading = added_resistance.get_added_resistance_newton(
         vessel_speed_kn=speed_kn,
-        weather=Weather(
-            significant_wave_height_m=3, mean_wave_period_s=10, wave_direction_deg=0
-        ),
+        weather=Weather(significant_wave_height_m=3, mean_wave_period_s=10, wave_direction_deg=0),
         heading_deg=0,
     )
     resistance_newton_heading_gt_45 = added_resistance.get_added_resistance_newton(
         vessel_speed_kn=speed_kn,
-        weather=Weather(
-            significant_wave_height_m=3, mean_wave_period_s=10, wave_direction_deg=0
-        ),
+        weather=Weather(significant_wave_height_m=3, mean_wave_period_s=10, wave_direction_deg=0),
         heading_deg=50,
     )
     assert resistance_newton == pytest.approx(resistance_newton_heading)
@@ -204,9 +196,7 @@ def test_added_resistance_for_stawave2(ship_dimension: ShipDimensionsAddedResist
     # test added resistance with when heading is given but the wave direction is not given
     resistance_newton_zero = added_resistance.get_added_resistance_newton(
         vessel_speed_kn=speed_kn,
-        weather=Weather(
-            significant_wave_height_m=0, mean_wave_period_s=0, wave_direction_deg=0
-        ),
+        weather=Weather(significant_wave_height_m=0, mean_wave_period_s=0, wave_direction_deg=0),
         heading_deg=0,
     )
     assert resistance_newton_zero == pytest.approx(0.0)
@@ -248,9 +238,7 @@ def test_wave_encounter_angle(ship_dimension: ShipDimensionsAddedResistance):
     added_resistance_value = added_resistance.get_added_resistance_newton(
         vessel_speed_kn=10, weather=weather, heading_deg=heading
     )
-    assert added_resistance_value == pytest.approx(
-        0
-    ), "The added resistance should be zero"
+    assert added_resistance_value == pytest.approx(0), "The added resistance should be zero"
 
 
 def test_snnm_method_for_resistance_component(
@@ -370,17 +358,15 @@ def test_snnm_method_for_wave_resistance(s_cb84_ship_dimension):
     resistance_stawave2_list = []
     for wave_height, wave_period in zip(wave_height_list, wave_period_list):
         start_time = time.time()
-        resistance_stawave2_newton = (
-            added_resistance_stawave2.get_added_resistance_newton(
-                vessel_speed_kn=speed_kn,
-                weather=Weather(
-                    significant_wave_height_m=wave_height,
-                    mean_wave_period_s=wave_period,
-                    wave_direction_deg=0,
-                ),
-                heading_deg=0,
-            )[0]
-        )
+        resistance_stawave2_newton = added_resistance_stawave2.get_added_resistance_newton(
+            vessel_speed_kn=speed_kn,
+            weather=Weather(
+                significant_wave_height_m=wave_height,
+                mean_wave_period_s=wave_period,
+                wave_direction_deg=0,
+            ),
+            heading_deg=0,
+        )[0]
         # print(f"SW2: wave_height={wave_height}, wave_period={wave_period}, time={(time.time() - start_time) / 7}")
         start_time = time.time()
         resistance_newton = np.array(
@@ -430,10 +416,9 @@ def test_snnm_method_for_integration_interval(s_cb84_ship_dimension):
     fig = make_subplots()
     # for interval in [100, 1000, 10000, 100000]:
     df = pd.DataFrame(index=wave_heading)
-    for wave_height, wave_period in zip(wave_height_list, wave_period_list):
+    for wave_height, wave_period in zip(wave_height_list, wave_period_list, strict=True):
         result = []
         for wave_direction_deg in tqdm(wave_heading):
-            start_time = time.time()
             result.append(
                 added_resistance.get_added_resistance_newton(
                     vessel_speed_kn=speed_kn,
@@ -454,15 +439,9 @@ def test_added_resistance_wind():
     """Test the added resistance by wind"""
     number_of_samples = 10
     transverse_area = 30 * 26.7
-    wind_speed_m_per_s = np.array(
-        [np.random.uniform(0, 10) for _ in range(number_of_samples)]
-    )
-    vessel_speed_kn = np.array(
-        [np.random.uniform(5, 15) for _ in range(number_of_samples)]
-    )
-    wind_direction = np.array(
-        [np.random.uniform(0, 360) for _ in range(number_of_samples)]
-    )
+    wind_speed_m_per_s = np.array([np.random.uniform(0, 10) for _ in range(number_of_samples)])
+    vessel_speed_kn = np.array([np.random.uniform(5, 15) for _ in range(number_of_samples)])
+    wind_direction = np.array([np.random.uniform(0, 360) for _ in range(number_of_samples)])
     heading = np.array([np.random.uniform(0, 360) for _ in range(number_of_samples)])
     added_resistance = AddedResistanceWindITTC(
         transverse_area_m2=transverse_area,
@@ -473,15 +452,11 @@ def test_added_resistance_wind():
     angle_vs = np.pi / 2 - np.deg2rad(heading)
     angle_vw = 3 * np.pi / 2 - np.deg2rad(wind_direction)
     vector_vs = (vs * np.array([np.cos(angle_vs), np.sin(angle_vs)])).transpose()
-    vector_vw = (
-        wind_speed_m_per_s * np.array([np.cos(angle_vw), np.sin(angle_vw)])
-    ).transpose()
+    vector_vw = (wind_speed_m_per_s * np.array([np.cos(angle_vw), np.sin(angle_vw)])).transpose()
     vector_rel_vw = vector_vw - vector_vs
     rel_wind_speed_ref = np.linalg.norm(vector_rel_vw, axis=1)
     rel_wind_speed_angle_ref = np.rad2deg(
-        np.arccos(
-            np.sum(vector_vs * -vector_rel_vw, axis=1) / (vs * rel_wind_speed_ref)
-        )
+        np.arccos(np.sum(vector_vs * -vector_rel_vw, axis=1) / (vs * rel_wind_speed_ref))
     )
     fig = make_subplots()
     for index in range(number_of_samples):
@@ -490,9 +465,7 @@ def test_added_resistance_wind():
             y=[0, vector_vs[index][1]],
             name=f"Vessel-{index}",
         )
-        fig.add_scatter(
-            x=[0, vector_vw[index][0]], y=[0, vector_vw[index][1]], name="Wind"
-        )
+        fig.add_scatter(x=[0, vector_vw[index][0]], y=[0, vector_vw[index][1]], name="Wind")
         fig.add_scatter(
             x=[vector_vs[index][0], vector_vs[index][0] + vector_rel_vw[index][0]],
             y=[vector_vs[index][1], vector_vs[index][1] + vector_rel_vw[index][1]],
@@ -503,18 +476,12 @@ def test_added_resistance_wind():
         scaleratio=1,
     )
     fig.show()
-    # print(f"Given: wind speed = {wind_speed_m_per_s} m/s, "
-    #       f"vessel speed = {vessel_speed_kn} kn, "
-    #       f"wind direction = {wind_direction} deg, "
-    #       f"heading = {heading} deg")
     (
         rel_wind_speed,
         rel_wind_speed_angle,
     ) = added_resistance._get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s=vs,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
     for index in range(number_of_samples):
@@ -522,14 +489,11 @@ def test_added_resistance_wind():
         assert rel_wind_speed_angle_ref[index] == pytest.approx(
             rel_wind_speed_angle[index] * 180 / np.pi
         )
-    resistance = added_resistance.get_added_resistance_newton(
+    added_resistance.get_added_resistance_newton(
         vessel_speed_kn=vs,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
-    # print(f"Resistance = {resistance} N")
 
 
 def test_added_resistance_wind_with_zero_speed():
@@ -546,9 +510,7 @@ def test_added_resistance_wind_with_zero_speed():
     )
     rel_speed, rel_angle = added_resistance._get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s=vessel_speed_kn,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
     assert np.allclose(rel_speed, wind_speed_m_per_s)
@@ -559,9 +521,7 @@ def test_added_resistance_wind_with_zero_speed():
     heading = wind_direction + 180
     rel_speed, rel_angle = added_resistance._get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s=vessel_speed_kn,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
     assert np.allclose(rel_speed, 0)
@@ -572,9 +532,7 @@ def test_added_resistance_wind_with_zero_speed():
     heading = np.zeros(1)
     rel_speed, rel_angle = added_resistance._get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s=vessel_speed_kn,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
     assert np.allclose(rel_speed, 0)
@@ -587,9 +545,7 @@ def test_added_resistance_wind_with_zero_speed():
     heading = np.array([0, 180, 90, 30])
     rel_speed, rel_angle = added_resistance._get_relative_wind_angle_and_speed(
         vessel_speed_m_per_s=vessel_speed_kn,
-        weather=Weather(
-            wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction
-        ),
+        weather=Weather(wind_speed_m_per_s=wind_speed_m_per_s, wind_direction_deg=wind_direction),
         heading_deg=heading,
     )
     assert np.allclose(rel_speed[:2], 0)
@@ -623,14 +579,10 @@ def test_added_resistance_wave_with_ntnu_head_sea(added_resistance_ntnu_general_
         os.path.dirname(__file__), "Liu_method_alldir_output_head_sea.csv"
     )
     ref_data = pd.read_csv(path_to_ref_data, index_col=0)
-    lpp = (
-        added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
-    )
+    lpp = added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
     b = added_resistance_ntnu_general_cargo.ship_dimension.b_beam_m
     cb = added_resistance_ntnu_general_cargo.ship_dimension.cb_block_coefficient
-    kyy = (
-        added_resistance_ntnu_general_cargo.ship_dimension.kyy_radius_gyration_in_lateral_direction_non_dim
-    )
+    kyy = added_resistance_ntnu_general_cargo.ship_dimension.kyy_radius_gyration_in_lateral_direction_non_dim
     wave_length_normalized = np.linspace(0.15, 2.04, 190)
     wave_length_m = wave_length_normalized * lpp
     omega = get_wave_frequency(wave_length_m)
@@ -726,19 +678,13 @@ def test_added_resistance_wave_with_ntnu_following_sea_120(
     """Test the added resistance by wave with NTNU data"""
     show_plot = False
     theta = 120  # Wave encounter angle 0 - head sea, 180 - following sea
-    path_to_ref_data = os.path.join(
-        os.path.dirname(__file__), "Liu_method_alldir_output_120.csv"
-    )
+    path_to_ref_data = os.path.join(os.path.dirname(__file__), "Liu_method_alldir_output_120.csv")
     ref_data = pd.read_csv(path_to_ref_data, index_col=0)
 
-    lpp = (
-        added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
-    )
+    lpp = added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
     b = added_resistance_ntnu_general_cargo.ship_dimension.b_beam_m
     cb = added_resistance_ntnu_general_cargo.ship_dimension.cb_block_coefficient
-    kyy = (
-        added_resistance_ntnu_general_cargo.ship_dimension.kyy_radius_gyration_in_lateral_direction_non_dim
-    )
+    kyy = added_resistance_ntnu_general_cargo.ship_dimension.kyy_radius_gyration_in_lateral_direction_non_dim
 
     wave_length_normalized = np.linspace(0.15, 2.04, 190)
     wave_length_m = wave_length_normalized * lpp
@@ -809,25 +755,21 @@ def test_added_resistance_wave_with_ntnu_following_sea_120(
 
     if show_plot:
         fig = ref_data.plot()
-        fig.add_scatter(x=wave_length_normalized, y=a1, name=f"a1-ref")
-        fig.add_scatter(x=wave_length_normalized, y=a2, name=f"a2-ref")
-        fig.add_scatter(x=wave_length_normalized, y=a3, name=f"a3-ref")
-        fig.add_scatter(x=wave_length_normalized, y=w_normalized, name=f"w-ref")
-        fig.add_scatter(x=wave_length_normalized, y=b1, name=f"b1-ref")
-        fig.add_scatter(x=wave_length_normalized, y=d1, name=f"d1-ref")
-        fig.add_scatter(x=wave_length_normalized, y=r_awr_comp[0], name=f"r1_awr-ref")
+        fig.add_scatter(x=wave_length_normalized, y=a1, name="a1-ref")
+        fig.add_scatter(x=wave_length_normalized, y=a2, name="a2-ref")
+        fig.add_scatter(x=wave_length_normalized, y=a3, name="a3-ref")
+        fig.add_scatter(x=wave_length_normalized, y=w_normalized, name="w-ref")
+        fig.add_scatter(x=wave_length_normalized, y=b1, name="b1-ref")
+        fig.add_scatter(x=wave_length_normalized, y=d1, name="d1-ref")
+        fig.add_scatter(x=wave_length_normalized, y=r_awr_comp[0], name="r1_awr-ref")
 
         r_awr = added_resistance_ntnu_general_cargo._get_non_dimensional_wave_resistance_due_to_reflection(
             wave_frequency_rad_per_s=omega,
             wave_incident_angle_rad=np.deg2rad(theta),
             vessel_speed_kn=vs_kn,
-        )[
-            0
-        ]
+        )[0]
         resistance_component = r_awm + r_awr
-        fig.add_scatter(
-            x=wave_length_normalized, y=resistance_component, name=f"theta={theta}"
-        )
+        fig.add_scatter(x=wave_length_normalized, y=resistance_component, name=f"theta={theta}")
         fig.add_scatter(x=wave_length_normalized, y=r_awm, name=f"theta={theta} (M)")
         fig.add_scatter(x=wave_length_normalized, y=r_awr, name=f"theta={theta} (R)")
         fig.show()
@@ -842,9 +784,7 @@ def test_added_resistance_ntnu_general_cargo_arbitrary_heading(
         os.path.dirname(__file__), "Liu_method_alldir_output_arbitrary_wave_dir.csv"
     )
     ref_data = pd.read_csv(path_to_ref_data, index_col=0)
-    lpp = (
-        added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
-    )
+    lpp = added_resistance_ntnu_general_cargo.ship_dimension.lpp_length_between_perpendiculars_m
     wave_length_normalized = np.linspace(0.15, 2.04, 190)
     wave_length_m = wave_length_normalized * lpp
     omega = get_wave_frequency(wave_length_m)
@@ -854,30 +794,213 @@ def test_added_resistance_ntnu_general_cargo_arbitrary_heading(
     for theta in [0, 30, 60, 90, 120, 150, 180]:
         (
             r_awr,
-            r_awr_comp,
+            _,
         ) = added_resistance_ntnu_general_cargo._get_non_dimensional_wave_resistance_due_to_reflection(
             wave_frequency_rad_per_s=omega,
             wave_incident_angle_rad=np.deg2rad(theta),
             vessel_speed_kn=vs_kn,
         )
-        r_awm = added_resistance_ntnu_general_cargo._get_non_dimensional_wave_resistance_due_to_motion(
-            wave_frequency_rad_per_s=omega,
-            wave_incident_angle_rad=np.deg2rad(theta),
-            vessel_speed_kn=vs_kn,
+        r_awm = (
+            added_resistance_ntnu_general_cargo._get_non_dimensional_wave_resistance_due_to_motion(
+                wave_frequency_rad_per_s=omega,
+                wave_incident_angle_rad=np.deg2rad(theta),
+                vessel_speed_kn=vs_kn,
+            )
         )
         r_aw = r_awr + r_awm
         assert np.allclose(ref_data[f"r_aw-{180 - theta}"], r_aw, atol=1e-3)
         assert np.allclose(ref_data[f"r_awm-{180 - theta}"], r_awm, atol=1e-3)
         assert np.allclose(ref_data[f"r_awr-{180 - theta}"], r_awr, atol=1e-3)
         if show_plot:
-            fig.add_scatter(
-                x=wave_length_normalized, y=r_aw, name=f"r_aw_theta={theta}"
-            )
-            fig.add_scatter(
-                x=wave_length_normalized, y=r_awr, name=f"r_awr_theta={theta}"
-            )
-            fig.add_scatter(
-                x=wave_length_normalized, y=r_awm, name=f"r_awm_theta={theta}"
-            )
+            fig.add_scatter(x=wave_length_normalized, y=r_aw, name=f"r_aw_theta={theta}")
+            fig.add_scatter(x=wave_length_normalized, y=r_awr, name=f"r_awr_theta={theta}")
+            fig.add_scatter(x=wave_length_normalized, y=r_awm, name=f"r_awm_theta={theta}")
     if show_plot:
         fig.show()
+
+
+def test_pierson_moskowitz_spectrum_ittc1978():
+    mean_wave_period_s = 11.44
+    significant_wave_height_m = 11
+
+    spectrum_pm = PiersonMoskowitzSpectrumITTC1978(
+        mean_wave_period_s=mean_wave_period_s,
+        significant_wave_height_m=significant_wave_height_m,
+    )
+    omega = np.linspace(0.01, 3, 300)
+    spectrum_density_pm = spectrum_pm.get_spectral_density_omega(omega_rad_per_s=omega)
+    fig = make_subplots()
+    fig.add_trace(go.Scatter(x=omega, y=spectrum_density_pm, name="Pierson-Moskowitz"))
+    fig.update_layout(title="Wave spectrum")
+    fig.update_xaxes(title=r"$\omega$")
+    fig.update_yaxes(title=r"$S(\omega)$")
+
+    for gamma_i in [1, 2.5, 7]:
+        spectrum_jonswap = JONSWAPSpectrumITTC1984(
+            significant_wave_height_m=significant_wave_height_m,
+            mean_wave_period_s=mean_wave_period_s,
+            gamma=gamma_i,
+        )
+        spectrum_density = spectrum_jonswap.get_spectral_density_omega(omega_rad_per_s=omega)
+        fig.add_trace(go.Scatter(x=omega, y=spectrum_density, name=rf"$JONSWAP-\gamma-{gamma}$"))
+    fig.show()
+
+
+def test_added_resistance_reference_from_langx_maow():
+    ship_dimension = ShipDimensionsAddedResistance(
+        b_beam_m=32.26,
+        lpp_length_between_perpendiculars_m=190,
+        cb_block_coefficient=0.6,
+        ta_draft_aft_m=9.5,
+        tf_draft_forward_m=9.5,
+        kyy_radius_gyration_in_lateral_direction_non_dim=0.26,
+    )
+
+    added_resistance_ref = {
+        "wave_height_m": np.array([0.9, 1.7, 2.7, 3.4]),
+        "added_resistance_n": np.array([19.4, 116.4, 261.0, 434.3]) * 1000,
+    }
+
+    added_resistance = AddedResistanceByStaWave2(
+        ship_dimension=ship_dimension,
+        wave_spectrum_type=WaveSpectrumType.JONSWAP_ITTC_1984,
+        gamma=3.3,
+    )
+    froude_number = 0.2
+    speed_m_per_s = froude_number * np.sqrt(
+        ship_dimension.lpp_length_between_perpendiculars_m * GRAVITY
+    )
+    r_aw_list = []
+    wave_length_list = []
+    speed_kn = m_per_s_to_kn(speed_m_per_s)
+    wave_height_array = np.linspace(0.1, 10, 100)
+    for wave_height in wave_height_array:
+        wave_period = 5 * np.sqrt(wave_height)
+        wave_length_list.append(wave_period**2 * GRAVITY / (2 * np.pi))
+        weather = Weather(significant_wave_height_m=wave_height, mean_wave_period_s=wave_period)
+        r_aw_list.append(
+            added_resistance.get_added_resistance_newton(vessel_speed_kn=speed_kn, weather=weather)[
+                0
+            ]
+        )
+
+    r_aw_pm_list = []
+    added_resistance = AddedResistanceByStaWave2(ship_dimension=ship_dimension)
+    for wave_height in wave_height_array:
+        wave_period = 5 * np.sqrt(wave_height)
+        weather = Weather(significant_wave_height_m=wave_height, mean_wave_period_s=wave_period)
+        r_aw_pm_list.append(
+            added_resistance.get_added_resistance_newton(vessel_speed_kn=speed_kn, weather=weather)[
+                0
+            ]
+        )
+
+    fig = make_subplots()
+    fig.add_trace(
+        go.Scatter(
+            x=added_resistance_ref["wave_height_m"],
+            y=added_resistance_ref["added_resistance_n"],
+            name="Measurement",
+        )
+    )
+    fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_list, name="JONSWAP"))
+    fig.add_trace(go.Scatter(x=wave_height_array, y=r_aw_pm_list, name="Pierson-Moskowitz"))
+    fig.show()
+
+    weather.wave_direction_deg = np.array([180])
+    heading = weather.wave_direction_deg - (45 + random.random() * 100)
+    assert weather.wave_direction_deg - heading > 45
+    assert (
+        added_resistance.get_added_resistance_newton(
+            vessel_speed_kn=16, weather=weather, heading_deg=heading
+        )
+        == 0
+    ), "The addded resistance should be 0."
+
+
+def test_weather_array():
+    # Test array input
+    significant_wave_height_m_list = []
+    mean_wave_period_s_list = []
+    wave_height_array = np.linspace(0.1, 10, 100)
+    for wave_height in wave_height_array:
+        significant_wave_height_m_list.append(wave_height)
+        mean_wave_period_s_list.append(5 * np.sqrt(wave_height))
+
+    Weather(
+        significant_wave_height_m=np.array(significant_wave_height_m_list),
+        mean_wave_period_s=np.array(mean_wave_period_s_list),
+    )
+
+
+def test_angular_distribution_function():
+    def _get_angular_component_in_angle(
+        wave_angle_rad: float, encounter_angle_rad: float, is_swell: bool = False
+    ) -> float:
+        """Calculate angular distribution for a given encounter angle and spreading parameter.
+
+        Reference: ITTC. (2021). Recommended Procedures and Guidelines: Preparation,
+        Conduct and Analysis of Speed/Power Trials.
+
+        @param encounter_angle_rad: Encounter angle in degrees
+        @param is_swell: If True, use spreading parameter for swells (0.75),
+        otherwise use spreading parameter for wind waves (1.0
+        @return: Angular distribution
+        """
+        spreading_parameter = 0.75 if is_swell else 1.0
+        gamma1 = gamma(1 + 2 * spreading_parameter)
+        gamma2 = gamma(1 + spreading_parameter)
+        angle_between = (wave_angle_rad - encounter_angle_rad) % (2 * np.pi)
+        angle_between = angle_between - 2 * np.pi if angle_between > np.pi else angle_between
+        angle_between = np.abs(angle_between)
+        if angle_between > np.pi / 2:
+            return 0.0
+        return (
+            np.power(2, 2 * spreading_parameter)
+            * np.power(gamma2, 2)
+            / (np.pi * gamma1)
+            * np.power(np.cos(angle_between), 2 * spreading_parameter)
+        )
+
+    # Testing angular distribution function
+    angle_array = np.linspace(0, 2 * np.pi, 361)
+    fig = make_subplots()
+    fig_cart = make_subplots()
+    integrated_value = []
+    for index in range(5):
+        encounter_angle = np.pi / 4 * index
+        angular_distribution = np.array(
+            [
+                _get_angular_component_in_angle(
+                    angle, encounter_angle_rad=encounter_angle, is_swell=False
+                )
+                for angle in angle_array
+            ]
+        )
+        fig.add_scatterpolar(
+            r=angular_distribution,
+            theta=angle_array * 180 / np.pi,
+            name=f"Encounter angle: {encounter_angle * 180 / np.pi}",
+        )
+        fig_cart.add_scatter(
+            x=angle_array * 180 / np.pi,
+            y=angular_distribution,
+            name=f"Encounter angle: {encounter_angle * 180 / np.pi}",
+        )
+        integrated_value.append(
+            quad(
+                func=_get_angular_component_in_angle,
+                a=0,
+                b=2 * np.pi,
+                args=(encounter_angle, False),
+            )[0]
+        )
+    fig.show()
+    fig_cart.show()
+    fig = make_subplots()
+    fig.add_scatter(
+        x=np.linspace(0, np.pi, 5),
+        y=np.array(integrated_value),
+        name="Integrated value",
+    )
+    fig.show()

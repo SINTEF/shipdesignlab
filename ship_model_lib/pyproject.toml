@@ -1,0 +1,188 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ship-model-lib"
+version = "1.0.2"
+description = "Model library for the hydrodynamics, energy system and fuel calculation"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+keywords = [
+  "Ship",
+  "Energy",
+  "Model",
+  "Hydrodynamics",
+  "Resistance",
+  "Propulsion",
+]
+authors = [{ name = "Kevin Koosup Yum", email = "kevin.koosup.yum@gmail.com" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+  "pandas>=2.0.0,<3",
+  "scipy>=1.11.0,<2",
+  "matplotlib~=3.8.2",
+  "plotly~=5.13.0",
+  "numpy~=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "jupyter~=1.0.0",
+  "jupyterlab~=4.1.0",
+  "keyring",
+  "pytest~=7.2.1",
+  "tqdm",
+  "twine~=4.0.2",
+  "typing_extensions~=4.11.0",
+  "ruff>=0.8.0",
+]
+
+test = ["pytest~=7.2.1", "pytest-cov"]
+
+# Optional: kaleido for plotly static image export (has platform limitations)
+# Install separately if needed: uv add --dev "kaleido~=0.2.1"
+
+[project.urls]
+Homepage = "https://github.com/SINTEF/shipdesignlab"
+Repository = "https://github.com/SINTEF/shipdesignlab"
+Issues = "https://github.com/SINTEF/shipdesignlab/issues"
+
+[tool.setuptools]
+packages = [
+  "ship_model_lib",
+  "ship_model_lib.data",
+  "ship_model_lib.dependencies",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+ship_model_lib = ["data/*", "dependencies/*"]
+
+# Ruff configuration
+[tool.ruff]
+line-length = 100
+indent-width = 4
+target-version = "py312"
+
+# Exclude common directories
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+]
+
+[tool.ruff.lint]
+# Enable recommended rules
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "N",   # pep8-naming
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "SIM", # flake8-simplify
+  "RUF", # Ruff-specific rules
+]
+
+# Ignore specific rules that may conflict with notebooks or are too strict
+ignore = [
+  "E501",   # line too long (handled by formatter)
+  "E402",   # module level import not at top of file
+  "E731",   # do not assign a lambda expression, use a def
+  "E741",   # ambiguous variable name
+  "B008",   # do not perform function calls in argument defaults
+  "B905",   # zip() without an explicit strict= parameter
+  "B904",   # raise from None or explicit exception
+  "SIM108", # use ternary operator (sometimes less readable)
+  "SIM113", # use enumerate instead of manual counter
+  "N802",   # function name should be lowercase
+  "N803",   # argument name should be lowercase
+  "N806",   # variable in function should be lowercase
+  "UP007",  # use X | Y for type annotations (keep Union for Python 3.9 compat)
+  "UP046",  # use type params syntax for generics (keep Generic[] for clarity)
+  "UP047",  # unnecessary quoted type annotation
+  "F841",   # local variable is assigned to but never used
+  "RUF013", # implicit optional in function signature
+]
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"] # Allow unused imports in __init__.py
+"tests/*" = ["S101"]             # Allow assert in tests
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["--verbose", "--color=yes"]
+filterwarnings = [
+  # Ignore pytest internal deprecation warnings
+  "ignore:ast\\.(Str|NameConstant|Num) is deprecated:DeprecationWarning:_pytest",
+  # Ignore matplotlib/pyparsing deprecation warnings  
+  "ignore::pyparsing.exceptions.PyparsingDeprecationWarning",
+  # Ignore numpy alltrue deprecation in pytest code
+  "ignore:`alltrue` is deprecated:DeprecationWarning",
+  # Ignore expected runtime warnings for zero speed edge cases
+  "ignore:divide by zero encountered:RuntimeWarning",
+  # Ignore numpy scalar conversion deprecation (will be fixed separately)
+  "ignore:Conversion of an array with ndim > 0 to a scalar:DeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["ship_model_lib"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:",
+]
